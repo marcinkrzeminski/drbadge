@@ -309,11 +309,11 @@ MVP koncentruje się na **core functionality**:
 
 ### Stripe Setup
 - [ ] Install `@stripe/stripe-js` client library
-- [ ] Create Stripe products in dashboard:
-  - Free Plan: $0/mo (for tracking only)
+- [ ] Create Stripe product in dashboard:
   - Paid Plan: $5/mo with all features
-- [ ] Get price IDs for both plans
+- [ ] Get price ID for paid plan
 - [ ] Add to `.env.local`
+- [ ] Note: Free plan handled in app logic (no Stripe product needed)
 
 ### Upgrade Flow
 - [ ] Create `components/billing/UpgradeModal.tsx`

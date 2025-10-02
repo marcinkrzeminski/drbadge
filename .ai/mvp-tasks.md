@@ -25,31 +25,31 @@ MVP koncentruje się na **core functionality**:
 ## Phase 1: Setup & Configuration (Day 1)
 
 ### Project Setup
-- [ ] Create Next.js 15.5 app with TypeScript
-- [ ] Setup Tailwind CSS
-- [ ] Install shadcn/ui CLI
-- [ ] Add shadcn/ui components: Button, Card, Input, Dialog, Select
-- [ ] Configure `.env.local` with all required variables
-- [ ] Setup Git repository with `.gitignore`
+- [x] Create Next.js 15.5 app with TypeScript
+- [x] Setup Tailwind CSS
+- [x] Install shadcn/ui CLI
+- [x] Add shadcn/ui components: Button, Card, Input, Dialog, Select
+- [x] Configure `.env.local` with all required variables
+- [x] Setup Git repository with `.gitignore`
 
 ### Dependencies
-- [ ] Install `@instantdb/react` and `@instantdb/admin`
-- [ ] Install `next-auth` v5
-- [ ] Install `stripe` SDK
-- [ ] Install `recharts` for charts
-- [ ] Install `react-hook-form` + `zod`
-- [ ] Install `sonner` for toast notifications
-- [ ] Install `date-fns` for date handling
+- [x] Install `@instantdb/react` and `@instantdb/admin`
+- [x] Install `next-auth` v5
+- [x] Install `stripe` SDK
+- [x] Install `recharts` for charts
+- [x] Install `react-hook-form` + `zod`
+- [x] Install `sonner` for toast notifications
+- [x] Install `date-fns` for date handling
 
 ### InstantDB Setup
-- [ ] Create InstantDB account at instantdb.com
-- [ ] Create new app and get App ID
-- [ ] Get Admin Token from dashboard
-- [ ] Add to `.env.local`: `NEXT_PUBLIC_INSTANTDB_APP_ID`
-- [ ] Add to `.env.local`: `INSTANTDB_ADMIN_TOKEN`
-- [ ] Create `lib/instant-client.ts` for client-side
-- [ ] Create `lib/instant-server.ts` for server-side
-- [ ] Test connection with simple query
+- [x] Create InstantDB account at instantdb.com
+- [x] Create new app and get App ID
+- [x] Get Admin Token from dashboard
+- [x] Add to `.env.local`: `NEXT_PUBLIC_INSTANTDB_APP_ID`
+- [x] Add to `.env.local`: `INSTANTDB_ADMIN_TOKEN`
+- [x] Create `lib/instant-client.ts` for client-side
+- [x] Create `lib/instant-server.ts` for server-side
+- [x] Test connection with simple query
 
 ### External Services
 - [ ] Create Google OAuth app in Google Cloud Console

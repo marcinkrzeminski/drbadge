@@ -227,13 +227,13 @@ export class SEOIntelligenceService {
 
 ### Email Service
 
-**Resend** (or React Email + Resend)
+**Plunk**
 
-- React Email for templates
-- Transactional emails via API
-- Weekly digest components
-- DR change alert templates
-- Preview in development
+- Simple API for transactional emails
+- React Email for templates (optional)
+- Weekly digest emails
+- DR change alert emails
+- Easy integration
 
 ### Frontend Libraries
 

@@ -44,8 +44,8 @@
 - [ ] Register for RapidAPI account
 - [ ] Subscribe to SEO Intelligence by KarmaLabs
 - [ ] Get RapidAPI key
-- [ ] Setup Resend account for emails
-- [ ] Configure email templates with React Email
+- [ ] Setup Plunk account for emails at useplunk.com
+- [ ] Get Plunk API key
 - [ ] Setup Vercel account for deployment
 - [ ] Connect GitHub repo to Vercel
 
@@ -384,10 +384,11 @@
 - [ ] Add summary stats
 
 ### Notification Jobs
+- [ ] Install @plunk/node package
 - [ ] Create SendDrChangeNotification job
 - [ ] Check user notification settings
 - [ ] Build email data
-- [ ] Send via Postmark/Resend
+- [ ] Send via Plunk API
 - [ ] Log email sent
 - [ ] Create SendWeeklyRecap job
 - [ ] Aggregate week's data

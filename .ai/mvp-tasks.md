@@ -61,8 +61,8 @@ MVP koncentruje się na **core functionality**:
 - [ ] Register RapidAPI account
 - [ ] Subscribe to SEO Intelligence by KarmaLabs ($10 plan)
 - [ ] Add RapidAPI key to `.env.local`
-- [ ] Create Resend account for emails
-- [ ] Add Resend API key to `.env.local`
+- [ ] Create Plunk account for emails
+- [ ] Add Plunk API key to `.env.local`
 
 ---
 
@@ -360,17 +360,16 @@ MVP koncentruje się na **core functionality**:
 
 ## Phase 9: Email Notifications (Day 12)
 
-### Resend Setup
-- [ ] Create Resend account
+### Plunk Setup
+- [ ] Create Plunk account at useplunk.com
 - [ ] Verify domain for sending emails
-- [ ] Add Resend API key to `.env.local`
-- [ ] Install `resend` npm package
+- [ ] Add Plunk API key to `.env.local`
+- [ ] Install `@plunk/node` npm package
 
-### Email Templates with React Email
-- [ ] Install `@react-email/components`
-- [ ] Create `emails/` folder for templates
-- [ ] Create `emails/DaChangeNotification.tsx`
-- [ ] Design email layout with branding
+### Email Templates
+- [ ] Create `lib/email-templates.ts` for email content
+- [ ] Create DA change notification template
+- [ ] Design email HTML with branding
 - [ ] Show domain name, old DA, new DA, change
 - [ ] Add "View Dashboard" CTA button
 - [ ] Make responsive for mobile
@@ -380,7 +379,7 @@ MVP koncentruje się na **core functionality**:
 - [ ] Implement `sendDaChangeEmail()` function
 - [ ] Check if DA changed significantly (> 1 point)
 - [ ] Check user's plan (free = daily batch, paid = instant)
-- [ ] Send email via Resend
+- [ ] Send email via Plunk API
 - [ ] Log email delivery
 - [ ] Handle send failures gracefully
 
@@ -534,7 +533,7 @@ MVP koncentruje się na **core functionality**:
   - STRIPE_SECRET_KEY
   - STRIPE_WEBHOOK_SECRET
   - RAPIDAPI_KEY
-  - RESEND_API_KEY
+  - PLUNK_API_KEY
   - UPSTASH_REDIS_URL
   - SENTRY_DSN
 
@@ -599,7 +598,7 @@ MVP koncentruje się na **core functionality**:
 - InstantDB (real-time database + auth)
 - Stripe (payments)
 - RapidAPI SEO Intelligence (DA tracking)
-- Resend (emails)
+- Plunk (emails)
 - Vercel (hosting + cron)
 
 **MVP delivers:**

@@ -11,8 +11,7 @@
 - [ ] Setup Git repository
 - [ ] Create .gitignore with Next.js defaults
 - [ ] Install additional dependencies:
-  - [ ] @instantdb/react for database
-  - [ ] next-auth for authentication
+  - [ ] @instantdb/react and @instantdb/admin for database
   - [ ] stripe for payments
   - [ ] react-hook-form + zod
   - [ ] shadcn/ui components
@@ -34,11 +33,10 @@
 - [ ] Verify real-time sync is working
 
 ### External Services Setup
-- [ ] Setup NextAuth.js configuration
-- [ ] Register Google OAuth application
+- [ ] Register Google OAuth application in Google Cloud Console
 - [ ] Get Google Client ID and Secret
-- [ ] Configure Google OAuth redirect URLs
-- [ ] Setup Twitter/X OAuth app (optional for MVP)
+- [ ] Configure OAuth redirect URL: https://api.instantdb.com/runtime/oauth/callback
+- [ ] Add Google OAuth to InstantDB dashboard
 - [ ] Create Stripe account
 - [ ] Get Stripe API keys (test mode)
 - [ ] Create Stripe products and prices
@@ -53,37 +51,31 @@
 
 ## Phase 1: Authentication System (Day 3-4)
 
-### OAuth Configuration
-- [ ] Configure NextAuth.js in app/api/auth/[...nextauth]/route.ts
-- [ ] Setup Google OAuth provider
-- [ ] Configure OAuth redirect URLs in Google Console
-- [ ] Add environment variables for Google Client ID/Secret
-- [ ] Create NextAuth configuration with InstantDB adapter
-- [ ] Implement callbacks for session and JWT
-- [ ] Setup OAuth success redirect
-- [ ] Setup OAuth error handling
-- [ ] Create or update user on OAuth callback
+### InstantDB OAuth Configuration
+- [ ] Add Google Client ID/Secret to InstantDB dashboard
+- [ ] Configure OAuth settings in InstantDB
+- [ ] Test OAuth flow in development
+- [ ] Create client-side auth component using InstantDB hooks
+- [ ] Implement useAuth() from @instantdb/react
+- [ ] Setup auth state management
+- [ ] Create protected route wrapper
+- [ ] Handle OAuth success redirect
+- [ ] Handle OAuth error states
 
 ### Session Management
-- [ ] Configure NextAuth.js session strategy (JWT)
-- [ ] Setup session cookies with secure flags
-- [ ] Create auth middleware for protected routes
-- [ ] Create client-side auth hooks
-- [ ] Setup session expiry handling
-- [ ] Implement automatic session refresh
-- [ ] Create signOut handler
-- [ ] Clear session on logout
+- [ ] InstantDB handles sessions automatically via JWT
+- [ ] Create client-side auth hooks wrapper
+- [ ] Setup auth state in React context (if needed)
+- [ ] Create signOut handler using InstantDB
+- [ ] Handle session expiry
+- [ ] Test session persistence
 
 ### User Model & InstantDB Integration
 - [ ] Define users schema in InstantDB
-- [ ] Add oauth_provider field
-- [ ] Add oauth_id field
 - [ ] Add email and name fields
-- [ ] Create lib/auth.ts for auth utilities
-- [ ] Implement createUserFromOAuth() using InstantDB
-- [ ] Implement getUserByOAuthId() using InstantDB
-- [ ] Implement updateLastActive() using InstantDB
-- [ ] Test user creation flow with InstantDB
+- [ ] InstantDB automatically creates users on OAuth
+- [ ] Create utility functions for user data
+- [ ] Test user creation flow
 - [ ] Test user login flow
 - [ ] Verify real-time sync between sessions
 

@@ -34,7 +34,6 @@ MVP koncentruje się na **core functionality**:
 
 ### Dependencies
 - [x] Install `@instantdb/react` and `@instantdb/admin`
-- [x] Install `next-auth` v5
 - [x] Install `stripe` SDK
 - [x] Install `recharts` for charts
 - [x] Install `react-hook-form` + `zod`
@@ -57,7 +56,7 @@ MVP koncentruje się na **core functionality**:
 - [ ] Add Google Client ID/Secret to `.env.local`
 - [ ] Create Stripe account
 - [ ] Get Stripe test API keys
-- [ ] Create Stripe products: Free (0$) and Paid ($5/mo)
+- [ ] Create Stripe product: Paid plan ($5/mo) - free plan handled in app
 - [ ] Add Stripe keys to `.env.local`
 - [ ] Register RapidAPI account
 - [ ] Subscribe to SEO Intelligence by KarmaLabs ($10 plan)
@@ -69,31 +68,26 @@ MVP koncentruje się na **core functionality**:
 
 ## Phase 2: Authentication (Day 2)
 
-### NextAuth.js Configuration
-- [ ] Create `app/api/auth/[...nextauth]/route.ts`
-- [ ] Configure Google OAuth provider
-- [ ] Setup JWT session strategy
-- [ ] Implement session callbacks
-- [ ] Create InstantDB adapter for NextAuth
-- [ ] Handle user creation on first OAuth login
-- [ ] Store oauth_provider, oauth_id, email, name, avatar_url
+### InstantDB OAuth Configuration
+- [ ] Add Google Client ID/Secret to InstantDB dashboard
+- [ ] Configure OAuth provider in InstantDB
+- [ ] Test OAuth flow with redirect URL
+- [ ] Verify user creation on first login
+- [ ] InstantDB automatically stores email, name, avatar
 - [ ] Test OAuth flow end-to-end
 
 ### Auth Utilities
-- [ ] Create `lib/auth.ts` with `auth()` helper
-- [ ] Create auth middleware for protected routes
-- [ ] Create `useSession` client hook wrapper
+- [ ] Create `lib/instant-client.ts` with auth exports
+- [ ] Export `useAuth` hook from InstantDB
+- [ ] Create protected route wrapper component
 - [ ] Handle authentication errors gracefully
-- [ ] Add sign out functionality
+- [ ] Add sign out functionality using InstantDB
 
 ### InstantDB Users Schema
+
 - [ ] Define users collection in InstantDB schema:
-  - id (string, primary)
-  - oauth_provider (string, indexed)
-  - oauth_id (string, indexed)
-  - email (string, indexed)
-  - name (string)
-  - avatar_url (string)
+  - id (string, primary) - auto-created by InstantDB
+  - email (string, indexed) - from OAuth
   - subscription_status (string) // 'free' | 'paid' | 'cancelled'
   - stripe_customer_id (string)
   - subscription_ends_at (timestamp)
@@ -544,6 +538,12 @@ MVP koncentruje się na **core functionality**:
   - UPSTASH_REDIS_URL
   - SENTRY_DSN
 
+### Production OAuth
+
+- [ ] Update Google OAuth redirect URLs for production domain
+- [ ] Test OAuth flow in production
+- [ ] Verify InstantDB auth works on production
+
 ### Production Stripe
 - [ ] Switch to Stripe live mode
 - [ ] Create live products and prices
@@ -596,8 +596,7 @@ MVP koncentruje się na **core functionality**:
 **Estimated Time: 17 days** (1 developer, full-time)
 **Core Tech Stack:**
 - Next.js 15.5 + TypeScript
-- InstantDB (real-time database)
-- NextAuth.js (authentication)
+- InstantDB (real-time database + auth)
 - Stripe (payments)
 - RapidAPI SEO Intelligence (DA tracking)
 - Resend (emails)

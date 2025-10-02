@@ -38,7 +38,7 @@ FrogDR Clone to aplikacja SaaS do monitorowania Domain Rating (DR) witryn intern
 #### OAuth-only Authentication
 
 - **Brak tradycyjnej rejestracji email/hasło**
-- Logowanie tylko przez Google OAuth lub Twitter/X OAuth
+- Logowanie tylko przez Google OAuth
 - Instant account creation po autoryzacji OAuth
 - Brak email verification, CAPTCHA, password requirements
 - Użytkownik przypisany na stałe do jednego OAuth provider
@@ -48,7 +48,7 @@ FrogDR Clone to aplikacja SaaS do monitorowania Domain Rating (DR) witryn intern
 - Zero-friction signup (< 30 sekund)
 - Automatyczne tworzenie profilu po OAuth
 - Brak możliwości linkowania wielu OAuth do jednego konta
-- Sesje zarządzane przez NextAuth.js
+- Sesje zarządzane przez InstantDB built-in auth
 
 ### 2. Dashboard Główny
 
@@ -312,7 +312,7 @@ Hit 3 domain limit → Show upgrade modal →
 
 ### Must Have (Launch)
 
-- OAuth login (Google only initially)
+- OAuth login (Google via InstantDB)
 - Add/remove domains (3 limit)
 - Daily DR updates
 - Basic line chart
@@ -322,7 +322,6 @@ Hit 3 domain limit → Show upgrade modal →
 
 ### Should Have (Miesiąc 1)
 
-- Twitter OAuth
 - Leaderboard basic
 - Manual refresh (paid)
 - Weekly recap emails

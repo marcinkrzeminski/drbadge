@@ -103,12 +103,12 @@
 
 ### Authentication
 
-**NextAuth.js v5**
+**InstantDB Built-in Auth**
 
 - Google OAuth 2.0 provider
-- Twitter/X OAuth provider
-- JWT session strategy
-- InstantDB adapter for users
+- Session management via InstantDB
+- No need for NextAuth - InstantDB handles it all
+- JWT tokens managed by InstantDB
 - No password authentication
 
 ### Payment Processing
@@ -309,7 +309,6 @@ app/
 │   ├── domains/[id]/page.tsx
 │   └── settings/page.tsx
 ├── api/
-│   ├── auth/[...nextauth]/route.ts
 │   ├── webhooks/stripe/route.ts
 │   └── domains/refresh/route.ts
 └── components/
@@ -323,18 +322,17 @@ app/
 ```typescript
 // app/dashboard/page.tsx - Server Component
 async function DashboardPage() {
-  const session = await auth();
-  const domains = await db.domains.findMany({
-    where: { userId: session.user.id },
-  });
-
-  return <DashboardClient domains={domains} />;
+  // InstantDB auth happens client-side, so we use client component
+  return <DashboardClient />;
 }
 
 // components/DashboardClient.tsx - Client Component
 ("use client");
-export function DashboardClient({ domains }) {
-  // Interactive client-side logic
+import { useAuth } from "@/lib/instant-client";
+
+export function DashboardClient() {
+  const { user, isLoading } = useAuth();
+  // InstantDB handles auth and real-time data
 }
 ```
 
@@ -343,24 +341,34 @@ export function DashboardClient({ domains }) {
 ```typescript
 // app/actions/domains.ts
 "use server";
+import { db } from "@/lib/instant-server";
+import { id } from "@instantdb/admin";
 
-export async function addDomain(url: string) {
-  const session = await auth();
-  if (!session) throw new Error("Unauthorized");
-
-  // Validate domain limit
-  const count = await db.domains.count({
-    where: { userId: session.user.id },
+export async function addDomain(userId: string, url: string) {
+  // Server-side validation
+  const { data } = await db.query({
+    domains: {
+      $: {
+        where: { userId }
+      }
+    }
   });
 
-  if (count >= 3 && !session.user.isPaid) {
+  if (data.domains.length >= 3) {
     throw new Error("Free plan limit reached");
   }
 
   // Add to InstantDB
-  return await db.domains.create({
-    data: { url, userId: session.user.id },
-  });
+  const domainId = id();
+  await db.transact(
+    db.domains[domainId].update({
+      url,
+      userId,
+      createdAt: Date.now()
+    })
+  );
+
+  return domainId;
 }
 ```
 
@@ -579,49 +587,45 @@ export class SEOIntelligenceService {
 
 ```typescript
 // app/api/domains/refresh/route.ts
-import { auth } from "@/lib/auth";
 import { SEOIntelligenceService } from "@/lib/seo-intelligence";
 import { db } from "@/lib/instant-server";
+import { id, tx } from "@instantdb/admin";
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  // Get userId from request (passed from client)
+  const { domainId, userId } = await req.json();
 
-  const { domainId } = await req.json();
-
-  // Check rate limits
-  const isLimited = await checkRateLimit(session.user.id);
-  if (isLimited) {
-    return new Response("Rate limit exceeded", { status: 429 });
-  }
-
-  // Fetch fresh metrics
-  const seo = new SEOIntelligenceService();
-  const domain = await db.domains.findFirst({
-    where: { id: domainId, userId: session.user.id },
+  // Verify user owns this domain
+  const { data } = await db.query({
+    domains: {
+      $: {
+        where: { id: domainId, userId }
+      }
+    }
   });
 
-  if (!domain) {
+  if (!data.domains || data.domains.length === 0) {
     return new Response("Domain not found", { status: 404 });
   }
 
+  const domain = data.domains[0];
+  const seo = new SEOIntelligenceService();
   const metrics = await seo.getDomainMetrics(domain.url);
 
   // Update InstantDB
+  const snapshotId = id();
   await db.transact([
     tx.domains[domainId].update({
       currentDa: metrics.domainAuthority,
       previousDa: domain.currentDa,
-      lastChecked: new Date().toISOString(),
+      lastChecked: Date.now(),
     }),
-    tx.dr_snapshots[id()].update({
+    tx.dr_snapshots[snapshotId].update({
       domainId,
       daValue: metrics.domainAuthority,
       backlinks: metrics.backlinks,
       referringDomains: metrics.referringDomains,
-      recordedAt: new Date().toISOString(),
+      recordedAt: Date.now(),
     }),
   ]);
 

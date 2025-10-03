@@ -419,6 +419,57 @@ MVP koncentruje się na **core functionality**:
 
 ---
 
+## Phase 7.5: User Roles & Admin Panel (Day 9.5)
+
+### User Roles System
+
+- [ ] Update users schema in InstantDB:
+  - Add `role` field (string) // 'user' | 'admin'
+  - Default to 'user' for new signups
+  - Admins have unlimited domains
+- [ ] Create `lib/roles.ts` utility:
+  - `isAdmin(user)` helper function
+  - `canAddDomain(user, currentCount)` check
+  - `getDomainLimit(user)` based on role and subscription
+- [ ] Update domain limit checks:
+  - Skip limit for admins
+  - Check `role === 'admin'` before subscription status
+- [ ] Update domain add logic to respect admin role
+
+### Admin Panel Access
+
+- [ ] Create `app/(dashboard)/admin/layout.tsx`
+- [ ] Add middleware to protect admin routes
+- [ ] Check user role before allowing access
+- [ ] Add "Admin Panel" link to sidebar (admin only)
+- [ ] Redirect non-admins to dashboard if accessing admin routes
+
+### Admin Dashboard
+
+- [ ] Create `app/(dashboard)/admin/page.tsx`
+- [ ] Display basic stats cards:
+  - Total Users count
+  - Total Paid Users count
+  - Total Domains count
+  - Monthly Revenue (from Stripe subscriptions)
+- [ ] Query InstantDB for user counts
+- [ ] Query InstantDB for domain counts
+- [ ] Calculate revenue from paid subscriptions ($5 * paid users)
+- [ ] Show stats in clean card layout
+- [ ] Add last updated timestamp
+
+### Admin Utilities
+
+- [ ] Create `lib/admin-stats.ts`:
+  - `getTotalUsers()` - count all users
+  - `getPaidUsers()` - count users with subscription_status = 'paid'
+  - `getTotalDomains()` - count all non-deleted domains
+  - `getMonthlyRevenue()` - calculate total MRR
+- [ ] Use server-side InstantDB queries
+- [ ] Cache stats for 5 minutes to reduce load
+
+---
+
 ## Phase 8: Stripe Payments (Day 10-11)
 
 ### Stripe Setup

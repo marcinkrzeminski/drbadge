@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { db, id } from "@/lib/instant-client";
+import { db } from "@/lib/instant-client";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -114,21 +114,29 @@ export function AddDomainModal({ open, onOpenChange }: AddDomainModalProps) {
     setIsSubmitting(true);
 
     try {
-      // Add domain to InstantDB
-      await db.transact(
-        db.tx.domains[id()].update({
-          user_id: user.id,
+      // Call API to add domain and fetch DR
+      const response = await fetch("/api/domains/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
           url: data.url,
-          normalized_url: normalizedUrl,
-          current_da: 0,
-          previous_da: 0,
-          da_change: 0,
-          last_checked: 0,
-          created_at: Date.now(),
-        })
-      );
+          normalizedUrl: normalizedUrl,
+        }),
+      });
 
-      toast.success("Domain added successfully!");
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error(result.error || "Failed to add domain");
+        return;
+      }
+
+      toast.success(
+        `Domain added successfully! DR: ${result.domain.current_da}`
+      );
       reset();
       onOpenChange(false);
     } catch (error) {
@@ -145,7 +153,7 @@ export function AddDomainModal({ open, onOpenChange }: AddDomainModalProps) {
         <DialogHeader>
           <DialogTitle>Add Domain</DialogTitle>
           <DialogDescription>
-            Enter the domain you want to track. We'll monitor its Domain Rating for you.
+            Enter the domain you want to track. We'll check its Domain Rating immediately and start monitoring it.
           </DialogDescription>
         </DialogHeader>
 

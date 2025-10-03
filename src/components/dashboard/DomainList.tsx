@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/lib/instant-client";
-import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck, ExternalLink } from "lucide-react";
+import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck, ExternalLink, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,10 +10,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BadgeModal } from "@/components/domains/BadgeModal";
 import { Sparkline } from "@/components/charts/Sparkline";
 import Link from "next/link";
+
+type ViewMode = "grid" | "table";
 
 export function DomainList() {
   const { user } = db.useAuth();
@@ -23,6 +25,21 @@ export function DomainList() {
     url: string;
     da: number;
   } | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
+
+  // Load view mode from localStorage
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem("domainViewMode") as ViewMode;
+    if (savedViewMode) {
+      setViewMode(savedViewMode);
+    }
+  }, []);
+
+  // Save view mode to localStorage
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem("domainViewMode", mode);
+  };
 
   // Query domains for the current user
   const { data, isLoading } = db.useQuery({
@@ -167,8 +184,32 @@ export function DomainList() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-900">Your Domains</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900">Your Domains</h2>
+        <div className="flex gap-2">
+          <Button
+            variant={viewMode === "grid" ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleViewModeChange("grid")}
+            className="gap-2"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Grid
+          </Button>
+          <Button
+            variant={viewMode === "table" ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleViewModeChange("table")}
+            className="gap-2"
+          >
+            <List className="h-4 w-4" />
+            Table
+          </Button>
+        </div>
+      </div>
+
+      {viewMode === "grid" ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {domains.map((domain) => {
           // Get snapshots for this domain
           const domainSnapshots = (data?.dr_snapshots || []).filter(
@@ -270,7 +311,134 @@ export function DomainList() {
             </Link>
           );
         })}
-      </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Domain
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  DR
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Change
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Trend
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Last Updated
+                </th>
+                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {domains.map((domain) => {
+                const domainSnapshots = (data?.dr_snapshots || []).filter(
+                  (s: any) => s.domain_id === domain.id
+                );
+
+                return (
+                  <tr key={domain.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <Link
+                        href={`/dashboard/domain/${domain.id}`}
+                        className="flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-blue-600"
+                      >
+                        {domain.url}
+                        <ExternalLink className="h-3 w-3 text-gray-400" />
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span className="text-xl font-bold text-gray-900">
+                        {domain.current_da || 0}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {domain.da_change !== undefined && domain.da_change !== 0 ? (
+                        <span
+                          className={`inline-flex items-center gap-1 text-sm font-medium ${
+                            domain.da_change > 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {domain.da_change > 0 ? "↑" : "↓"}
+                          {Math.abs(domain.da_change)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="w-32">
+                        <Sparkline snapshots={domainSnapshots} />
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                      {domain.last_checked
+                        ? new Date(domain.last_checked).toLocaleDateString()
+                        : "Never"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            disabled={deletingId === domain.id}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() =>
+                              setBadgeModalDomain({
+                                url: domain.url,
+                                da: domain.current_da || 0,
+                              })
+                            }
+                            className="gap-2"
+                          >
+                            <BadgeCheck className="h-4 w-4" />
+                            Get Badge
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleRefresh(domain.id, domain.url)}
+                            className="gap-2"
+                            disabled={refreshingId === domain.id || !isPaidUser}
+                          >
+                            <RefreshCw
+                              className={`h-4 w-4 ${
+                                refreshingId === domain.id ? "animate-spin" : ""
+                              }`}
+                            />
+                            Refresh {!isPaidUser && "(Paid only)"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(domain.id, domain.url)}
+                            className="gap-2 text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Remove
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {badgeModalDomain && (
         <BadgeModal

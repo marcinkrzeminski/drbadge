@@ -1,0 +1,59 @@
+// Docs: https://www.instantdb.com/docs/modeling-data
+
+import { i } from "@instantdb/core";
+
+const _schema = i.schema({
+  entities: {
+    "$files": i.entity({
+      "path": i.string().unique().indexed(),
+      "url": i.string().optional(),
+    }),
+    "$users": i.entity({
+      "email": i.string().unique().indexed().optional(),
+      "type": i.string().optional(),
+    }),
+    "users": i.entity({
+      "auth_id": i.string().unique().indexed(), // Reference to $users.id
+      "email": i.string().indexed(),
+      "subscription_status": i.string(), // 'free' | 'paid' | 'cancelled'
+      "stripe_customer_id": i.string().optional(),
+      "subscription_ends_at": i.number().optional(), // Unix timestamp
+      "domains_limit": i.number(), // 3 or 12
+      "created_at": i.number(), // Unix timestamp
+    }),
+    "domains": i.entity({
+      "user_id": i.string().indexed(),
+      "url": i.string(),
+      "normalized_url": i.string().indexed(),
+      "current_da": i.number(),
+      "previous_da": i.number(),
+      "da_change": i.number(),
+      "last_checked": i.number(), // Unix timestamp
+      "created_at": i.number(), // Unix timestamp
+      "deleted_at": i.number().optional(), // Soft delete
+    }),
+    "dr_snapshots": i.entity({
+      "domain_id": i.string().indexed(),
+      "da_value": i.number(),
+      "backlinks": i.number().optional(),
+      "referring_domains": i.number().optional(),
+      "recorded_at": i.number().indexed(), // Unix timestamp
+    }),
+    "api_usage": i.entity({
+      "provider": i.string(), // 'karmalabs'
+      "domain": i.string(),
+      "cost": i.number(), // e.g., 0.001
+      "created_at": i.number().indexed(), // Unix timestamp
+    }),
+  },
+  links: {},
+  rooms: {},
+});
+
+// This helps Typescript display nicer intellisense
+type _AppSchema = typeof _schema;
+interface AppSchema extends _AppSchema {}
+const schema: AppSchema = _schema;
+
+export type { AppSchema };
+export default schema;

@@ -12,6 +12,7 @@ if (!ADMIN_TOKEN) {
 }
 
 // Initialize InstantDB admin for server-side operations
+// Schema-less mode - attributes will be created dynamically
 const db = init({
   appId: APP_ID,
   adminToken: ADMIN_TOKEN,

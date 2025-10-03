@@ -1,15 +1,40 @@
 "use client";
 
-import { db } from "@/lib/instant-client";
+import { useAuth, auth } from "@/lib/instant-client";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { isLoading, user } = db.useAuth();
+  const { isLoading, user } = useAuth();
+  const [isInitializing, setIsInitializing] = useState(false);
+  const [googleAuthUrl, setGoogleAuthUrl] = useState("");
 
-  // Create Google OAuth URL
-  const googleAuthUrl = db.auth.createAuthorizationURL({
-    clientName: "google-web",
-    redirectURL: window.location.href,
-  });
+  // Initialize user on first login
+  useEffect(() => {
+    if (user && !isInitializing) {
+      setIsInitializing(true);
+      fetch("/api/auth/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, email: user.email }),
+      })
+        .then(() => setIsInitializing(false))
+        .catch((err) => {
+          console.error("Failed to initialize user:", err);
+          setIsInitializing(false);
+        });
+    }
+  }, [user, isInitializing]);
+
+  // Create Google OAuth URL (client-side only)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const url = auth.createAuthorizationURL({
+        clientName: "google-web",
+        redirectURL: window.location.href,
+      });
+      setGoogleAuthUrl(url);
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -45,7 +70,7 @@ export default function Home() {
               </pre>
             </div>
             <button
-              onClick={() => db.auth.signOut()}
+              onClick={() => auth.signOut()}
               className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm h-12 px-6"
             >
               Sign Out

@@ -85,22 +85,26 @@ MVP koncentruje się na **core functionality**:
 
 ### Auth Utilities
 
-- [ ] Create `lib/instant-client.ts` with auth exports
-- [ ] Export `useAuth` hook from InstantDB
-- [ ] Create protected route wrapper component
-- [ ] Handle authentication errors gracefully
-- [ ] Add sign out functionality using InstantDB
+- [x] Create `lib/instant-client.ts` with auth exports
+- [x] Export `useAuth` hook from InstantDB
+- [x] Create protected route wrapper component
+- [x] Handle authentication errors gracefully
+- [x] Add sign out functionality using InstantDB
 
 ### InstantDB Users Schema
 
-- [ ] Define users collection in InstantDB schema:
+- [x] Define users collection in InstantDB schema:
   - id (string, primary) - auto-created by InstantDB
+  - auth_id (string, indexed) - reference to $users.id
   - email (string, indexed) - from OAuth
   - subscription_status (string) // 'free' | 'paid' | 'cancelled'
   - stripe_customer_id (string)
   - subscription_ends_at (timestamp)
   - domains_limit (number) // 3 or 12
   - created_at (timestamp)
+- [x] Push schema to InstantDB using instant-cli
+- [x] Setup permissions for users collection
+- [x] Test user initialization on first login
 
 ---
 

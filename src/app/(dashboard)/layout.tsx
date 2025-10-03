@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { UserInitializer } from "@/components/providers/UserInitializer";
 
 export default function DashboardLayout({
   children,
@@ -6,13 +7,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          {children}
-        </div>
-      </main>
-    </div>
+    <>
+      <UserInitializer />
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto px-4 py-8 max-w-7xl">
+            {children}
+          </div>
+        </main>
+      </div>
+    </>
   );
 }

@@ -12,13 +12,13 @@ export function StatsCards() {
       $: {
         where: {
           user_id: user?.id,
-          deleted_at: null,
         },
       },
     },
   });
 
-  const domains = data?.domains || [];
+  // Filter out deleted domains
+  const domains = (data?.domains || []).filter(d => !d.deleted_at || d.deleted_at === 0);
   const totalDomains = domains.length;
 
   // Calculate average DR

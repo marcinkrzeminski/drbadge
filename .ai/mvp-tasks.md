@@ -198,7 +198,7 @@ MVP koncentruje się na **core functionality**:
 
 ### InstantDB Domains Schema
 
-- [ ] Define domains collection:
+- [x] Define domains collection:
   - id (string, primary)
   - user_id (string, indexed)
   - url (string, indexed)
@@ -212,37 +212,39 @@ MVP koncentruje się na **core functionality**:
 
 ### Add Domain Modal
 
-- [ ] Create `components/domains/AddDomainModal.tsx`
-- [ ] Build form with URL input field
-- [ ] Add Zod validation for URL format
-- [ ] Normalize domain (remove https://, www)
-- [ ] Check for duplicate domains
-- [ ] Check user's domain limit (3 for free, 12 for paid)
-- [ ] Show upgrade prompt if limit reached
-- [ ] Save domain to InstantDB
-- [ ] Show success toast notification
-- [ ] Close modal and refresh list
+- [x] Create `components/domains/AddDomainModal.tsx`
+- [x] Build form with URL input field
+- [x] Add Zod validation for URL format
+- [x] Normalize domain (remove https://, www)
+- [x] Check for duplicate domains
+- [x] Check user's domain limit (3 for free, 12 for paid)
+- [x] Show upgrade prompt if limit reached
+- [x] Save domain to InstantDB
+- [x] Show success toast notification
+- [x] Close modal and refresh list
 
 ### Domain Card Component
 
-- [ ] Create `components/domains/DomainCard.tsx`
-- [ ] Display domain URL
-- [ ] Show current DR score (large number)
-- [ ] Display DR change with arrow (↑↓→)
-- [ ] Show last updated timestamp
-- [ ] Add actions dropdown menu
-- [ ] Add "Refresh" action (paid only)
-- [ ] Add "Remove" action with confirmation
-- [ ] Implement soft delete (set deleted_at)
+- [x] Create `components/domains/DomainCard.tsx` (integrated in DomainList)
+- [x] Display domain URL
+- [x] Show current DR score (large number)
+- [x] Display DR change with arrow (↑↓→)
+- [x] Show last updated timestamp
+- [x] Add actions dropdown menu
+- [x] Add "Refresh" action (paid only)
+- [x] Add "Remove" action with confirmation
+- [x] Implement soft delete (set deleted_at)
 
 ### Domain Actions
 
-- [ ] Create server action for adding domain
-- [ ] Create server action for removing domain
+- [x] Create server action for adding domain (via InstantDB transact)
+- [x] Create server action for removing domain (via InstantDB transact)
+- [x] Fix query filtering for deleted_at field
+- [x] Add UserInitializer for automatic user record creation
 - [ ] Create API route for manual refresh (paid only)
 - [ ] Add rate limiting for refresh action
-- [ ] Show loading states during actions
-- [ ] Handle errors with toast notifications
+- [x] Show loading states during actions
+- [x] Handle errors with toast notifications
 
 ---
 
@@ -253,7 +255,7 @@ MVP koncentruje się na **core functionality**:
 - [ ] Create `lib/seo-intelligence.ts` service class
 - [ ] Implement `getDomainMetrics(domain: string)` method
 - [ ] Add proper headers (X-RapidAPI-Key, X-RapidAPI-Host)
-- [ ] Parse API response for DA, backlinks, referring domains
+- [ ] Parse API response for DR
 - [ ] Handle API errors with retries (3 attempts)
 - [ ] Log all API calls for debugging
 

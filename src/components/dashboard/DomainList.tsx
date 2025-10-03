@@ -1,11 +1,20 @@
 "use client";
 
 import { db } from "@/lib/instant-client";
-import { Plus } from "lucide-react";
+import { Plus, MoreVertical, Trash2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function DomainList() {
   const { user } = db.useAuth();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Query domains for the current user
   const { data, isLoading } = db.useQuery({
@@ -13,13 +22,37 @@ export function DomainList() {
       $: {
         where: {
           user_id: user?.id,
-          deleted_at: null,
         },
       },
     },
   });
 
-  const domains = data?.domains || [];
+  // Filter out deleted domains (where deleted_at exists and is > 0)
+  const domains = (data?.domains || []).filter(d => !d.deleted_at || d.deleted_at === 0);
+
+  const handleDelete = async (domainId: string, domainUrl: string) => {
+    if (!confirm(`Are you sure you want to remove ${domainUrl}?`)) {
+      return;
+    }
+
+    setDeletingId(domainId);
+
+    try {
+      // Soft delete: set deleted_at timestamp
+      await db.transact(
+        db.tx.domains[domainId].update({
+          deleted_at: Date.now(),
+        })
+      );
+
+      toast.success("Domain removed successfully");
+    } catch (error) {
+      console.error("Error deleting domain:", error);
+      toast.error("Failed to remove domain. Please try again.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -105,6 +138,34 @@ export function DomainList() {
                     : "Never"}
                 </p>
               </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    disabled={deletingId === domain.id}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => toast.info("Manual refresh coming soon")}
+                    className="gap-2"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Refresh
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(domain.id, domain.url)}
+                    className="gap-2 text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         ))}

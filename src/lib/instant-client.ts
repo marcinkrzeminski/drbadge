@@ -1,6 +1,6 @@
 "use client";
 
-import { init } from "@instantdb/react";
+import { init, id } from "@instantdb/react";
 
 const APP_ID = "00786ac8-3707-4954-ac0d-70effb85707a";
 
@@ -18,4 +18,4 @@ export const auth = {
     db.auth.createAuthorizationURL(params),
 };
 
-export { db };
+export { db, id };

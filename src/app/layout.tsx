@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "DrBadge - Track Your Domain Rating",
   description: "Monitor your website's Domain Rating effortlessly with instant alerts and beautiful charts.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://drbadge.com'),
 };
 
 export default function RootLayout({

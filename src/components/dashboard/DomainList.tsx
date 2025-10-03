@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/lib/instant-client";
-import { Plus, MoreVertical, Trash2, RefreshCw } from "lucide-react";
+import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,11 +11,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useState } from "react";
+import { BadgeModal } from "@/components/domains/BadgeModal";
 
 export function DomainList() {
   const { user } = db.useAuth();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [refreshingId, setRefreshingId] = useState<string | null>(null);
+  const [badgeModalDomain, setBadgeModalDomain] = useState<{
+    url: string;
+    da: number;
+  } | null>(null);
 
   // Query domains for the current user
   const { data, isLoading } = db.useQuery({
@@ -211,6 +216,13 @@ export function DomainList() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
+                    onClick={() => setBadgeModalDomain({ url: domain.url, da: domain.current_da || 0 })}
+                    className="gap-2"
+                  >
+                    <BadgeCheck className="h-4 w-4" />
+                    Get Badge
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
                     onClick={() => handleRefresh(domain.id, domain.url)}
                     className="gap-2"
                     disabled={refreshingId === domain.id || !isPaidUser}
@@ -231,6 +243,15 @@ export function DomainList() {
           </div>
         ))}
       </div>
+
+      {badgeModalDomain && (
+        <BadgeModal
+          open={!!badgeModalDomain}
+          onOpenChange={(open) => !open && setBadgeModalDomain(null)}
+          domain={badgeModalDomain.url}
+          drValue={badgeModalDomain.da}
+        />
+      )}
     </div>
   );
 }

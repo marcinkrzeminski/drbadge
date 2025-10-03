@@ -326,48 +326,51 @@ MVP koncentruje się na **core functionality**:
 
 ### Public Domain Card Page (like FrogDR)
 
-- [ ] Create `app/[domain-slug]/page.tsx` for public domain pages
-- [ ] Design domain card UI similar to FrogDR:
+- [x] Create `app/domain/[slug]/page.tsx` for public domain pages
+- [x] Design domain card UI similar to FrogDR:
   - Large DR number with circular badge
   - Domain name and URL
   - "Certified Domain Rating" label
   - Last updated timestamp
   - Trend indicator (↑↓→)
-- [ ] Fetch domain data from Redis (if cached)
-- [ ] Fallback to InstantDB if not in Redis
-- [ ] Cache response in Redis for 24h
-- [ ] Make page SEO-friendly with meta tags
-- [ ] Add Open Graph tags for social sharing
-- [ ] Ensure fast load times (<1s)
+- [x] Fetch domain data from Redis (if cached)
+- [x] Fallback to InstantDB if not in Redis
+- [x] Cache response in Redis for 24h
+- [x] Make page SEO-friendly with meta tags
+- [x] Add Open Graph tags for social sharing
+- [x] Ensure fast load times (<1s)
 
 ### Badge Embed System
 
-- [ ] Create `components/badge/BadgeCustomizer.tsx`
-- [ ] Implement customization options:
+- [x] Create `components/badge/BadgeCustomizer.tsx`
+- [x] Implement customization options:
   - **Style**: Normal, Small, Tiny
   - **Color**: White, Light, Dark
   - **Icon**: Default (circle), Checkmark
   - **Shape**: Rect, Round
   - **Text**: Custom text input (e.g., "certified domain rating")
   - **Text Style**: Regular, Bold, Italic, Bold Italic
-- [ ] Create badge preview component
-- [ ] Generate embed code with customization params
-- [ ] Create `app/api/badge/[domain]/route.ts` for badge SVG
-- [ ] Generate dynamic SVG based on query params
-- [ ] Serve with proper cache headers (24h)
-- [ ] Add "Copy Embed Code" button
+- [x] Create badge preview component
+- [x] Generate embed code with customization params
+- [x] Create `app/api/badge/route.ts` for badge SVG
+- [x] Generate dynamic SVG based on query params
+- [x] Serve with proper cache headers (24h)
+- [x] Add "Copy Embed Code" button
+- [x] Add "Get Badge" button to domain dropdown menu
+- [x] Create BadgeModal component
 
 ### Redis Cache for Public Endpoints
 
-- [ ] Install `@upstash/redis` package
-- [ ] Create `lib/redis-public.ts` utility
-- [ ] Implement cache functions:
+- [x] Install `@upstash/redis` package
+- [x] Create `lib/redis-public.ts` utility
+- [x] Implement cache functions:
   - `getPublicDomain(slug: string)` - get from Redis
   - `setPublicDomain(slug: string, data)` - save to Redis (24h TTL)
   - `invalidatePublicDomain(slug: string)` - clear cache on update
-- [ ] Update domain update logic to invalidate Redis cache
-- [ ] Ensure public endpoints check Redis first
-- [ ] Log cache hits/misses for monitoring
+- [x] Update domain update logic to invalidate Redis cache
+- [x] Ensure public endpoints check Redis first
+- [x] Log cache hits/misses for monitoring
+- [x] Add Upstash Redis environment variables to `.env.local`
 
 ### Badge Analytics (Optional MVP)
 

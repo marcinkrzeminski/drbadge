@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { init } from '@instantdb/admin';
 import { seoIntelligence } from '@/lib/seo-intelligence';
+import { invalidatePublicDomain } from '@/lib/redis-public';
 
 const db = init({
   appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -72,6 +73,9 @@ export async function POST(request: NextRequest) {
       metrics.referringDomains,
       now
     );
+
+    // Invalidate Redis cache for public endpoints
+    await invalidatePublicDomain(normalizedUrl);
 
     return NextResponse.json({
       success: true,

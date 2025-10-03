@@ -167,30 +167,30 @@ MVP koncentruje się na **core functionality**:
 
 ### Dashboard Layout
 
-- [ ] Create `app/(dashboard)/layout.tsx` for authenticated pages
-- [ ] Build sidebar navigation
-- [ ] Add user profile section (avatar, name, email)
-- [ ] Add navigation items: Dashboard, Settings, Billing
-- [ ] Create mobile hamburger menu
-- [ ] Add sign out button
+- [x] Create `app/(dashboard)/layout.tsx` for authenticated pages
+- [x] Build sidebar navigation
+- [x] Add user profile section (avatar, name, email)
+- [x] Add navigation items: Dashboard, Settings, Billing
+- [x] Create mobile hamburger menu
+- [x] Add sign out button
 
 ### Dashboard Home
 
-- [ ] Create `app/(dashboard)/dashboard/page.tsx`
-- [ ] Protect route with auth middleware
-- [ ] Show welcome message for new users
-- [ ] Display empty state with "Add your first domain" CTA
-- [ ] Show quick stats cards: Total Domains, Avg DR
-- [ ] Create "Add Domain" button
+- [x] Create `app/(dashboard)/dashboard/page.tsx`
+- [x] Protect route with auth middleware
+- [x] Show welcome message for new users
+- [x] Display empty state with "Add your first domain" CTA
+- [x] Show quick stats cards: Total Domains, Avg DR
+- [x] Create "Add Domain" button
 
 ### Domains List Component
 
-- [ ] Create `components/domains/DomainList.tsx`
-- [ ] Fetch user's domains from InstantDB
-- [ ] Display domains in responsive grid
-- [ ] Show empty state when no domains
-- [ ] Add loading skeleton states
-- [ ] Handle real-time updates from InstantDB
+- [x] Create `components/domains/DomainList.tsx`
+- [x] Fetch user's domains from InstantDB
+- [x] Display domains in responsive grid
+- [x] Show empty state when no domains
+- [x] Add loading skeleton states
+- [x] Handle real-time updates from InstantDB
 
 ---
 

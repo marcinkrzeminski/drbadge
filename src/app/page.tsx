@@ -5,15 +5,41 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { db } from "@/lib/instant-client";
 import { ArrowRight, BarChart3, Bell, TrendingUp, Zap } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function HomePage() {
+  const router = useRouter();
+  const { isLoading, user } = db.useAuth();
+
+  // Redirect to dashboard if user is logged in
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push("/dashboard");
+    }
+  }, [isLoading, user, router]);
+
   const handleSignIn = () => {
     const url = db.auth.createAuthorizationURL({
       clientName: "google-web",
-      redirectURL: window.location.origin,
+      redirectURL: window.location.origin + "/dashboard",
     });
     window.location.href = url;
   };
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Don't render landing page if user is logged in
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

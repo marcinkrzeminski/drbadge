@@ -384,38 +384,38 @@ MVP koncentruje się na **core functionality**:
 
 ### Chart Component
 
-- [ ] Create `components/charts/DomainChart.tsx`
-- [ ] Install and setup Recharts
-- [ ] Fetch domain snapshots from InstantDB
-- [ ] Format data for line chart (dates, DA values)
-- [ ] Display line chart with DA over time
-- [ ] Add hover tooltips with exact values
-- [ ] Make chart responsive
+- [x] Create `components/charts/DomainChart.tsx`
+- [x] Install and setup Recharts
+- [x] Fetch domain snapshots from InstantDB
+- [x] Format data for line chart (dates, DA values)
+- [x] Display line chart with DA over time
+- [x] Add hover tooltips with exact values
+- [x] Make chart responsive
 
 ### Time Range Selector
 
-- [ ] Add time range buttons: 7d, 30d, 90d, All
-- [ ] Filter snapshots by selected range
-- [ ] Update chart when range changes
-- [ ] Set default to 30 days
+- [x] Add time range buttons: 7d, 30d, 90d, All
+- [x] Filter snapshots by selected range
+- [x] Update chart when range changes
+- [x] Set default to 30 days
 
 ### Domain Detail Page
 
-- [ ] Create `app/(dashboard)/domains/[id]/page.tsx`
-- [ ] Display large DR score at top
-- [ ] Show full historical chart
-- [ ] Display DR change statistics
-- [ ] Show backlinks count (paid only)
-- [ ] Show referring domains count (paid only)
-- [ ] Add back button to dashboard
+- [x] Create `app/(dashboard)/domains/[id]/page.tsx`
+- [x] Display large DR score at top
+- [x] Show full historical chart
+- [x] Display DR change statistics
+- [x] Show backlinks count (paid only)
+- [x] Show referring domains count (paid only)
+- [x] Add back button to dashboard
 
 ### Sparkline on Dashboard
 
-- [ ] Create `components/charts/Sparkline.tsx`
-- [ ] Show mini 7-day trend chart
-- [ ] Add to each domain card
-- [ ] Remove axes for minimal look
-- [ ] Add subtle gradient fill
+- [x] Create `components/charts/Sparkline.tsx`
+- [x] Show mini 7-day trend chart
+- [x] Add to each domain card
+- [x] Remove axes for minimal look
+- [x] Add subtle gradient fill
 
 ---
 

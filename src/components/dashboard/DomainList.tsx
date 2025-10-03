@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/lib/instant-client";
-import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck } from "lucide-react";
+import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +12,8 @@ import {
 import { toast } from "sonner";
 import { useState } from "react";
 import { BadgeModal } from "@/components/domains/BadgeModal";
+import { Sparkline } from "@/components/charts/Sparkline";
+import Link from "next/link";
 
 export function DomainList() {
   const { user } = db.useAuth();
@@ -31,6 +33,7 @@ export function DomainList() {
         },
       },
     },
+    dr_snapshots: {},
   });
 
   // Query user data to check subscription status
@@ -166,82 +169,107 @@ export function DomainList() {
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-gray-900">Your Domains</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {domains.map((domain) => (
-          <div
-            key={domain.id}
-            className="rounded-lg border border-gray-200 bg-white p-6 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-medium text-gray-900 truncate">
-                  {domain.url}
-                </h3>
-                <div className="mt-3 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-gray-900">
-                    {domain.current_da || 0}
-                  </span>
-                  <span className="text-sm text-gray-500">DR</span>
-                </div>
-                {domain.da_change !== undefined && domain.da_change !== 0 && (
-                  <div className="mt-2">
-                    <span
-                      className={`inline-flex items-center gap-1 text-xs font-medium ${
-                        domain.da_change > 0
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {domain.da_change > 0 ? "↑" : "↓"}
-                      {Math.abs(domain.da_change)}
-                    </span>
+        {domains.map((domain) => {
+          // Get snapshots for this domain
+          const domainSnapshots = (data?.dr_snapshots || []).filter(
+            (s: any) => s.domain_id === domain.id
+          );
+
+          return (
+            <Link
+              key={domain.id}
+              href={`/dashboard/domain/${domain.id}`}
+              className="group"
+            >
+              <div className="rounded-lg border border-gray-200 bg-white p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-medium text-gray-900 truncate">
+                        {domain.url}
+                      </h3>
+                      <ExternalLink className="h-3 w-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <div className="mt-3 flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-gray-900">
+                        {domain.current_da || 0}
+                      </span>
+                      <span className="text-sm text-gray-500">DR</span>
+                    </div>
+                    {domain.da_change !== undefined && domain.da_change !== 0 && (
+                      <div className="mt-2">
+                        <span
+                          className={`inline-flex items-center gap-1 text-xs font-medium ${
+                            domain.da_change > 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {domain.da_change > 0 ? "↑" : "↓"}
+                          {Math.abs(domain.da_change)}
+                        </span>
+                      </div>
+                    )}
+                    <div className="mt-3">
+                      <Sparkline snapshots={domainSnapshots} />
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      Last updated:{" "}
+                      {domain.last_checked
+                        ? new Date(domain.last_checked).toLocaleDateString()
+                        : "Never"}
+                    </p>
                   </div>
-                )}
-                <p className="mt-2 text-xs text-gray-500">
-                  Last updated:{" "}
-                  {domain.last_checked
-                    ? new Date(domain.last_checked).toLocaleDateString()
-                    : "Never"}
-                </p>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        disabled={deletingId === domain.id}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setBadgeModalDomain({ url: domain.url, da: domain.current_da || 0 });
+                        }}
+                        className="gap-2"
+                      >
+                        <BadgeCheck className="h-4 w-4" />
+                        Get Badge
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleRefresh(domain.id, domain.url);
+                        }}
+                        className="gap-2"
+                        disabled={refreshingId === domain.id || !isPaidUser}
+                      >
+                        <RefreshCw className={`h-4 w-4 ${refreshingId === domain.id ? 'animate-spin' : ''}`} />
+                        Refresh {!isPaidUser && "(Paid only)"}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleDelete(domain.id, domain.url);
+                        }}
+                        className="gap-2 text-red-600 focus:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Remove
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    disabled={deletingId === domain.id}
-                  >
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => setBadgeModalDomain({ url: domain.url, da: domain.current_da || 0 })}
-                    className="gap-2"
-                  >
-                    <BadgeCheck className="h-4 w-4" />
-                    Get Badge
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleRefresh(domain.id, domain.url)}
-                    className="gap-2"
-                    disabled={refreshingId === domain.id || !isPaidUser}
-                  >
-                    <RefreshCw className={`h-4 w-4 ${refreshingId === domain.id ? 'animate-spin' : ''}`} />
-                    Refresh {!isPaidUser && "(Paid only)"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => handleDelete(domain.id, domain.url)}
-                    className="gap-2 text-red-600 focus:text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Remove
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {badgeModalDomain && (

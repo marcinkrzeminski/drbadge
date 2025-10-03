@@ -17,6 +17,20 @@ export function StatsCards() {
     },
   });
 
+  // Query user data to get domains_limit
+  const { data: userData } = db.useQuery({
+    users: {
+      $: {
+        where: {
+          auth_id: user?.id,
+        },
+      },
+    },
+  });
+
+  const currentUser = userData?.users?.[0];
+  const domainsLimit = currentUser?.domains_limit || 3;
+
   // Filter out deleted domains
   const domains = (data?.domains || []).filter(d => !d.deleted_at || d.deleted_at === 0);
   const totalDomains = domains.length;
@@ -38,7 +52,10 @@ export function StatsCards() {
               {isLoading ? (
                 <span className="inline-block h-9 w-16 bg-gray-200 animate-pulse rounded"></span>
               ) : (
-                totalDomains
+                <>
+                  {totalDomains}
+                  <span className="text-lg text-gray-400 font-normal"> / {domainsLimit}</span>
+                </>
               )}
             </p>
           </div>

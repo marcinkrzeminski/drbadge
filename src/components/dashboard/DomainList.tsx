@@ -15,6 +15,7 @@ import { useState } from "react";
 export function DomainList() {
   const { user } = db.useAuth();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [refreshingId, setRefreshingId] = useState<string | null>(null);
 
   // Query domains for the current user
   const { data, isLoading } = db.useQuery({
@@ -26,6 +27,20 @@ export function DomainList() {
       },
     },
   });
+
+  // Query user data to check subscription status
+  const { data: userData } = db.useQuery({
+    users: {
+      $: {
+        where: {
+          auth_id: user?.id,
+        },
+      },
+    },
+  });
+
+  const currentUser = userData?.users?.[0];
+  const isPaidUser = currentUser?.subscription_status === 'paid';
 
   // Filter out deleted domains (where deleted_at exists and is > 0)
   const domains = (data?.domains || []).filter(d => !d.deleted_at || d.deleted_at === 0);
@@ -51,6 +66,51 @@ export function DomainList() {
       toast.error("Failed to remove domain. Please try again.");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleRefresh = async (domainId: string, domainUrl: string) => {
+    if (!isPaidUser) {
+      toast.error("Manual refresh is only available for paid users");
+      return;
+    }
+
+    setRefreshingId(domainId);
+
+    try {
+      const response = await fetch("/api/domains/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          domainId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          toast.error(
+            `Rate limit exceeded. Reset at ${new Date(data.resetAt).toLocaleTimeString()}`
+          );
+        } else if (response.status === 403) {
+          toast.error("Upgrade to paid plan for manual refresh");
+        } else {
+          toast.error(data.error || data.details || "Failed to refresh domain");
+        }
+        return;
+      }
+
+      toast.success(
+        `${domainUrl} refreshed! DA: ${data.domain.previous_da} → ${data.domain.current_da}`
+      );
+    } catch (error) {
+      console.error("Error refreshing domain:", error);
+      toast.error("Failed to refresh domain. Please try again.");
+    } finally {
+      setRefreshingId(null);
     }
   };
 
@@ -151,11 +211,12 @@ export function DomainList() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onClick={() => toast.info("Manual refresh coming soon")}
+                    onClick={() => handleRefresh(domain.id, domain.url)}
                     className="gap-2"
+                    disabled={refreshingId === domain.id || !isPaidUser}
                   >
-                    <RefreshCw className="h-4 w-4" />
-                    Refresh
+                    <RefreshCw className={`h-4 w-4 ${refreshingId === domain.id ? 'animate-spin' : ''}`} />
+                    Refresh {!isPaidUser && "(Paid only)"}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleDelete(domain.id, domain.url)}

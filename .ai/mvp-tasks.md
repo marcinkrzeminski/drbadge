@@ -252,55 +252,128 @@ MVP koncentruje się na **core functionality**:
 
 ### RapidAPI Service
 
-- [ ] Create `lib/seo-intelligence.ts` service class
-- [ ] Implement `getDomainMetrics(domain: string)` method
-- [ ] Add proper headers (X-RapidAPI-Key, X-RapidAPI-Host)
-- [ ] Parse API response for DR
-- [ ] Handle API errors with retries (3 attempts)
-- [ ] Log all API calls for debugging
+- [x] Create `lib/seo-intelligence.ts` service class
+- [x] Implement `getDomainMetrics(domain: string)` method
+- [x] Add proper headers (X-RapidAPI-Key, X-RapidAPI-Host)
+- [x] Parse API response for DR
+- [x] Handle API errors with retries (3 attempts)
+- [x] Log all API calls for debugging
 
-### Caching Strategy
+### Caching Strategy - Dual Layer
 
-- [ ] Setup Upstash Redis for free tier
+**For Dashboard (Authenticated Users):**
+- [x] Use InstantDB as source of truth
+- [x] Real-time subscriptions for instant updates
+- [x] No external cache needed
+
+**For Public Pages (Badge/Cards):**
+- [ ] Setup Upstash Redis for public endpoints
 - [ ] Add Upstash credentials to `.env.local`
-- [ ] Implement cache key pattern: `seo:${domain}`
-- [ ] Set 24h TTL for cached responses
-- [ ] Check cache before API call
-- [ ] Store API response in cache after fetch
+- [ ] Implement cache key pattern: `public:${domain}`
+- [ ] Set 24h TTL for public cached responses
+- [ ] Check Redis before InstantDB for public requests
+- [ ] Update Redis after domain DA updates
 
-### Cost Tracking
+### Cost Tracking & Budget Monitoring
 
-- [ ] Create `api_usage` collection in InstantDB:
+- [x] Create `api_usage` collection in InstantDB:
   - id (string, primary)
   - provider (string) // 'karmalabs'
   - domain (string)
-  - cost (number) // 0.001
+  - cost (number) // 0.01
   - created_at (timestamp, indexed)
-- [ ] Track every API call with cost
-- [ ] Create function to calculate monthly spend
-- [ ] Add budget check before API calls
-- [ ] Log warning when 80% budget reached
+- [x] Track every API call with cost
+- [x] Create budget monitoring utilities in `lib/budget-monitor.ts`
+- [x] Create hourly cron job `/api/cron/budget-monitor`
+- [x] Send email alert at 70%+ budget usage
+- [x] Monthly limit: $50
 
 ### Domain Update Logic
 
-- [ ] Create `app/api/domains/update/route.ts`
-- [ ] Fetch fresh DA from SEO Intelligence API
-- [ ] Update domain's current_da and previous_da
-- [ ] Calculate da_change
-- [ ] Create snapshot entry
-- [ ] Return updated domain data
+- [x] Create `app/api/domains/update/route.ts`
+- [x] Fetch fresh DA from SEO Intelligence API
+- [x] Update domain's current_da and previous_da
+- [x] Calculate da_change
+- [x] Create snapshot entry
+- [x] Track API usage
+- [x] Return updated domain data
+
+### Manual Refresh (Paid Users)
+
+- [x] Create `app/api/domains/refresh/route.ts`
+- [x] Check user subscription status (paid only)
+- [x] Implement rate limiting (10 refreshes/hour)
+- [x] Fetch fresh DA immediately
+- [x] Update domain and create snapshot
+- [x] Track API usage
+- [x] Add refresh button in UI (paid users only)
 
 ### Snapshots Schema
 
-- [ ] Define dr_snapshots collection:
+- [x] Define dr_snapshots collection:
   - id (string, primary)
   - domain_id (string, indexed)
   - da_value (number)
   - backlinks (number, nullable)
   - referring_domains (number, nullable)
   - recorded_at (timestamp, indexed)
-- [ ] Create snapshot on every DA update
-- [ ] Store historical data for charts
+- [x] Create snapshot on every DA update
+- [x] Store historical data for charts
+
+---
+
+## Phase 6.5: Public Domain Pages & Badge System (Day 8-9)
+
+### Public Domain Card Page (like FrogDR)
+
+- [ ] Create `app/[domain-slug]/page.tsx` for public domain pages
+- [ ] Design domain card UI similar to FrogDR:
+  - Large DR number with circular badge
+  - Domain name and URL
+  - "Certified Domain Rating" label
+  - Last updated timestamp
+  - Trend indicator (↑↓→)
+- [ ] Fetch domain data from Redis (if cached)
+- [ ] Fallback to InstantDB if not in Redis
+- [ ] Cache response in Redis for 24h
+- [ ] Make page SEO-friendly with meta tags
+- [ ] Add Open Graph tags for social sharing
+- [ ] Ensure fast load times (<1s)
+
+### Badge Embed System
+
+- [ ] Create `components/badge/BadgeCustomizer.tsx`
+- [ ] Implement customization options:
+  - **Style**: Normal, Small, Tiny
+  - **Color**: White, Light, Dark
+  - **Icon**: Default (circle), Checkmark
+  - **Shape**: Rect, Round
+  - **Text**: Custom text input (e.g., "certified domain rating")
+  - **Text Style**: Regular, Bold, Italic, Bold Italic
+- [ ] Create badge preview component
+- [ ] Generate embed code with customization params
+- [ ] Create `app/api/badge/[domain]/route.ts` for badge SVG
+- [ ] Generate dynamic SVG based on query params
+- [ ] Serve with proper cache headers (24h)
+- [ ] Add "Copy Embed Code" button
+
+### Redis Cache for Public Endpoints
+
+- [ ] Install `@upstash/redis` package
+- [ ] Create `lib/redis-public.ts` utility
+- [ ] Implement cache functions:
+  - `getPublicDomain(slug: string)` - get from Redis
+  - `setPublicDomain(slug: string, data)` - save to Redis (24h TTL)
+  - `invalidatePublicDomain(slug: string)` - clear cache on update
+- [ ] Update domain update logic to invalidate Redis cache
+- [ ] Ensure public endpoints check Redis first
+- [ ] Log cache hits/misses for monitoring
+
+### Badge Analytics (Optional MVP)
+
+- [ ] Track badge impressions (optional)
+- [ ] Track embed code copies
+- [ ] Store in `badge_stats` collection (optional)
 
 ---
 

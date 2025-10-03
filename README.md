@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DrBadge
+
+Track your website's Domain Rating effortlessly with instant alerts and beautiful charts.
+
+## Features
+
+- 🎯 **Domain Rating Tracking** - Monitor DR changes automatically
+- 📊 **Historical Charts** - View DR trends with interactive charts and sparklines
+- 🏷️ **Embeddable Badges** - Showcase your domain authority on your website
+- 📱 **Dashboard Views** - Grid or table view with sorting options
+- 🔔 **Email Alerts** - Get notified when your DR changes
+- 📈 **Data Visualization** - Time range filters (7d, 30d, 90d, All time)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ and npm
+- InstantDB account
+- RapidAPI account (SEO Intelligence API)
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd drbadge
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up environment variables - create a `.env.local` file with:
+
+```env
+NEXT_PUBLIC_INSTANTDB_APP_ID=your_instant_app_id
+INSTANTDB_ADMIN_TOKEN=your_admin_token
+RAPIDAPI_KEY=your_rapidapi_key
+RAPIDAPI_HOST=seo-intelligence.p.rapidapi.com
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Generate Historical Data
 
-## Learn More
+To populate your domains with historical DR snapshots for testing:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npx tsx scripts/generate-historical-data.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**What it does:**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Fetches all domains from your database
+- Generates 31 snapshots per domain (every 3 days for 90 days)
+- Creates realistic data with random trends (up/down/stable)
+- Saves snapshots to `dr_snapshots` collection
 
-## Deploy on Vercel
+This is useful for:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Testing chart visualizations
+- Demonstrating sparklines
+- Populating the dashboard with sample data
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Database:** InstantDB (real-time)
+- **Styling:** Tailwind CSS 4
+- **Charts:** Recharts
+- **API:** SEO Intelligence (RapidAPI)
+- **Auth:** InstantDB Auth
+- **Payments:** Stripe

@@ -168,7 +168,7 @@ export function DomainList() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-gray-900">Your Domains</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {domains.map((domain) => {
           // Get snapshots for this domain
           const domainSnapshots = (data?.dr_snapshots || []).filter(

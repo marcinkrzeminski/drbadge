@@ -112,19 +112,19 @@ MVP koncentruje się na **core functionality**:
 
 ### Layout & Navigation
 
-- [ ] Create `app/(marketing)/layout.tsx` for public pages
-- [ ] Build navigation header component
-- [ ] Add logo placeholder
-- [ ] Add "Sign In" button with Google OAuth
-- [ ] Create footer component
+- [x] Create `app/(marketing)/layout.tsx` for public pages
+- [x] Build navigation header component
+- [x] Add logo placeholder
+- [x] Add "Sign In" button with Google OAuth
+- [x] Create footer component
 
 ### Homepage Content
 
-- [ ] Create `app/(marketing)/page.tsx`
-- [ ] Build hero section with headline
-- [ ] Add value proposition text
-- [ ] Create CTA buttons (Sign Up with Google)
-- [ ] Implement Google OAuth button using InstantDB:
+- [x] Create `app/(marketing)/page.tsx`
+- [x] Build hero section with headline
+- [x] Add value proposition text
+- [x] Create CTA buttons (Sign Up with Google)
+- [x] Implement Google OAuth button using InstantDB:
 
   ```tsx
   const url = db.auth.createAuthorizationURL({
@@ -134,32 +134,32 @@ MVP koncentruje się na **core functionality**:
   // Use url in <a> or <Link> component
   ```
 
-- [ ] Add hero image/illustration placeholder
-- [ ] Create features grid (3-4 key features)
-- [ ] Add social proof section (testimonials placeholder)
+- [x] Add hero image/illustration placeholder
+- [x] Create features grid (3-4 key features)
+- [x] Add social proof section (testimonials placeholder)
 
 ### Pricing Section
 
-- [ ] Create pricing comparison table
-- [ ] Build Free plan card:
+- [x] Create pricing comparison table
+- [x] Build Free plan card:
   - 3 domains
   - Daily updates
   - Basic DR tracking
   - Email alerts (weekly)
-- [ ] Build Paid plan card ($5/mo):
+- [x] Build Paid plan card ($5/mo):
   - 12 domains
   - 4x daily updates
   - Manual refresh
   - Backlinks data
   - Instant alerts
-- [ ] Add "Get Started" CTA buttons
-- [ ] Link to sign up with Google OAuth
+- [x] Add "Get Started" CTA buttons
+- [x] Link to sign up with Google OAuth
 
 ### Responsive Design
 
-- [ ] Make landing page mobile-responsive
-- [ ] Test on mobile, tablet, desktop breakpoints
-- [ ] Optimize images for web
+- [x] Make landing page mobile-responsive
+- [x] Test on mobile, tablet, desktop breakpoints
+- [x] Optimize images for web
 
 ---
 

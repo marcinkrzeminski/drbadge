@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/lib/instant-client";
-import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck, ExternalLink, LayoutGrid, List } from "lucide-react";
+import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck, ExternalLink, LayoutGrid, List, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,12 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BadgeModal } from "@/components/domains/BadgeModal";
 import { Sparkline } from "@/components/charts/Sparkline";
 import Link from "next/link";
 
 type ViewMode = "grid" | "table";
+type SortField = "name" | "dr" | "change";
+type SortDirection = "asc" | "desc";
 
 export function DomainList() {
   const { user } = db.useAuth();
@@ -26,12 +28,23 @@ export function DomainList() {
     da: number;
   } | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("table");
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   // Load view mode from localStorage
   useEffect(() => {
     const savedViewMode = localStorage.getItem("domainViewMode") as ViewMode;
+    const savedSortField = localStorage.getItem("domainSortField") as SortField;
+    const savedSortDirection = localStorage.getItem("domainSortDirection") as SortDirection;
+
     if (savedViewMode) {
       setViewMode(savedViewMode);
+    }
+    if (savedSortField) {
+      setSortField(savedSortField);
+    }
+    if (savedSortDirection) {
+      setSortDirection(savedSortDirection);
     }
   }, []);
 
@@ -39,6 +52,14 @@ export function DomainList() {
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
     localStorage.setItem("domainViewMode", mode);
+  };
+
+  // Handle sort change
+  const handleSortChange = (field: SortField, direction: SortDirection) => {
+    setSortField(field);
+    setSortDirection(direction);
+    localStorage.setItem("domainSortField", field);
+    localStorage.setItem("domainSortDirection", direction);
   };
 
   // Query domains for the current user
@@ -68,7 +89,32 @@ export function DomainList() {
   const isPaidUser = currentUser?.subscription_status === 'paid';
 
   // Filter out deleted domains (where deleted_at exists and is > 0)
-  const domains = (data?.domains || []).filter(d => !d.deleted_at || d.deleted_at === 0);
+  const filteredDomains = (data?.domains || []).filter(d => !d.deleted_at || d.deleted_at === 0);
+
+  // Sort domains based on selected field and direction
+  const domains = useMemo(() => {
+    const sorted = [...filteredDomains];
+
+    sorted.sort((a, b) => {
+      let compareValue = 0;
+
+      switch (sortField) {
+        case "name":
+          compareValue = a.url.localeCompare(b.url);
+          break;
+        case "dr":
+          compareValue = (a.current_da || 0) - (b.current_da || 0);
+          break;
+        case "change":
+          compareValue = (a.da_change || 0) - (b.da_change || 0);
+          break;
+      }
+
+      return sortDirection === "asc" ? compareValue : -compareValue;
+    });
+
+    return sorted;
+  }, [filteredDomains, sortField, sortDirection]);
 
   const handleDelete = async (domainId: string, domainUrl: string) => {
     if (!confirm(`Are you sure you want to remove ${domainUrl}?`)) {
@@ -187,6 +233,53 @@ export function DomainList() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Your Domains</h2>
         <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <ArrowUpDown className="h-4 w-4" />
+                Sort
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => handleSortChange("name", "asc")}
+                className={sortField === "name" && sortDirection === "asc" ? "bg-gray-100" : ""}
+              >
+                Name (A-Z)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleSortChange("name", "desc")}
+                className={sortField === "name" && sortDirection === "desc" ? "bg-gray-100" : ""}
+              >
+                Name (Z-A)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleSortChange("dr", "desc")}
+                className={sortField === "dr" && sortDirection === "desc" ? "bg-gray-100" : ""}
+              >
+                DR (High to Low)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleSortChange("dr", "asc")}
+                className={sortField === "dr" && sortDirection === "asc" ? "bg-gray-100" : ""}
+              >
+                DR (Low to High)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleSortChange("change", "desc")}
+                className={sortField === "change" && sortDirection === "desc" ? "bg-gray-100" : ""}
+              >
+                Change (High to Low)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleSortChange("change", "asc")}
+                className={sortField === "change" && sortDirection === "asc" ? "bg-gray-100" : ""}
+              >
+                Change (Low to High)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button
             variant={viewMode === "grid" ? "default" : "outline"}
             size="sm"

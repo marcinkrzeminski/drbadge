@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { init, id } from "@instantdb/admin";
 import { seoIntelligence } from "@/lib/seo-intelligence";
+import { getUser } from "@/lib/user-utils";
+import { getDomainsLimitForUser } from "@/lib/stripe";
 
 const db = init({
   appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -16,6 +18,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
+      );
+    }
+
+    // Get user data and check subscription limits
+    const user = await getUser(userId);
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Get current domain count
+    const { domains: userDomains } = await db.query({
+      domains: {
+        $: {
+          where: {
+            user_id: userId,
+            deleted_at: { $isNull: true }, // Only count non-deleted domains
+          },
+        },
+      },
+    });
+
+    const domainsLimit = getDomainsLimitForUser(user.subscription_status);
+    if ((userDomains?.length || 0) >= domainsLimit) {
+      return NextResponse.json(
+        {
+          error: `Domain limit exceeded. You can track up to ${domainsLimit} domains with your current plan.`,
+        },
+        { status: 403 }
+      );
+    }
+
+    // Check for duplicate domains
+    const duplicate = userDomains?.find((d: any) => d.normalized_url === normalizedUrl);
+    if (duplicate) {
+      return NextResponse.json(
+        { error: "This domain is already being tracked" },
+        { status: 409 }
       );
     }
 

@@ -262,11 +262,13 @@ MVP koncentruje się na **core functionality**:
 ### Caching Strategy - Dual Layer
 
 **For Dashboard (Authenticated Users):**
+
 - [x] Use InstantDB as source of truth
 - [x] Real-time subscriptions for instant updates
 - [x] No external cache needed
 
 **For Public Pages (Badge/Cards):**
+
 - [ ] Setup Upstash Redis for public endpoints
 - [ ] Add Upstash credentials to `.env.local`
 - [ ] Implement cache key pattern: `public:${domain}`
@@ -454,7 +456,7 @@ MVP koncentruje się na **core functionality**:
   - Monthly Revenue (from Stripe subscriptions)
 - [ ] Query InstantDB for user counts
 - [ ] Query InstantDB for domain counts
-- [ ] Calculate revenue from paid subscriptions ($5 * paid users)
+- [ ] Calculate revenue from paid subscriptions ($5 \* paid users)
 - [ ] Show stats in clean card layout
 - [ ] Add last updated timestamp
 
@@ -469,6 +471,11 @@ MVP koncentruje się na **core functionality**:
 - [ ] Cache stats for 5 minutes to reduce load
 
 ---
+
+## Phase 7.7 RapidAPI Extend
+
+- https://rapidapi.com/karmalabs/api/seo-intelligence-pro/playground/apiendpoint_86009d49-36c2-4744-9fca-4f643c377c5b
+- https://rapidapi.com/titan-dev-squad-titan-dev-squad-default/api/domain-metrics-check/playground/apiendpoint_2a36a715-b611-4157-a273-1a315dbb785d
 
 ## Phase 8: Stripe Payments (Day 10-11)
 

@@ -1,0 +1,150 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Implement Freemium Billing System with Stripe",
+        "description": "Set up comprehensive billing system with free (3 domains) and paid ($5/mo, 12 domains) plans using Stripe integration",
+        "details": "Create Stripe webhook handlers, billing API endpoints, subscription management, payment flow, and upgrade/downgrade logic. Implement billing dashboard page with invoice history, payment methods, and plan management. Add subscription status enforcement throughout the app. Use Stripe Customer Portal for self-service billing management.",
+        "testStrategy": "Test payment flows with Stripe test cards, verify webhook handling, validate subscription limits, test plan upgrades/downgrades, and ensure billing status updates reflect across the application",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2025-10-23T20:46:21.166Z"
+      },
+      {
+        "id": 2,
+        "title": "Enhance Domain Monitoring with Paid Features",
+        "description": "Implement tiered monitoring frequencies, manual refresh capabilities, and advanced metrics for paid users",
+        "details": "Add cron job system for 4x daily updates for paid users vs 1x daily for free users. Implement manual refresh API endpoint with rate limiting. Add backlinks and referring domains tracking to paid plans. Create activity pause logic after 10 days inactivity for free users. Update domain refresh UI to show frequency based on plan.",
+        "testStrategy": "Test cron job scheduling, verify refresh frequency differences between plans, validate manual refresh limits, test inactivity pause logic, and confirm advanced metrics are only shown to paid users",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Build Gamification System with Leaderboard",
+        "description": "Create competitive leaderboard, milestone celebrations, and goal setting features for paid users",
+        "details": "Build global leaderboard with DR rankings, filtering by categories, and optional anonymization. Add confetti animations for milestone achievements (DR 10, 25, 50, 75). Implement custom milestone setting per domain. Create goal-setting interface with progress tracking and ETA calculations. Add badge system for achievements. Store gamification data in InstantDB with real-time updates.",
+        "testStrategy": "Test leaderboard ranking accuracy, verify milestone triggers and animations, validate goal progress calculations, test anonymization features, and ensure real-time leaderboard updates",
+        "priority": "medium",
+        "dependencies": [
+          "1",
+          "2"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Implement Growth Section with Link Building Opportunities",
+        "description": "Create curated directory listings and educational content section for paid users",
+        "details": "Build database of 50+ high-quality directories with do-follow guarantees. Create opportunity tracking system to monitor which directories have been used. Add success rate statistics and ROI tracking. Implement 1 opportunity per monitored domain logic. Create educational content management system with best practices, case studies, and monthly challenges. Use markdown-based content management.",
+        "testStrategy": "Verify directory database accuracy, test opportunity tracking and limits, validate success rate calculations, test content management system, and ensure paid-only access restrictions",
+        "priority": "medium",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Build Advanced Email Notification System",
+        "description": "Create tiered email notification system with instant alerts for paid users and batched alerts for free users",
+        "details": "Implement email service using Resend/SendGrid with React Email templates. Create notification preferences per domain with threshold settings. Set up instant DR change alerts for paid users and daily batch notifications for free users. Add weekly recap emails every Monday. Implement milestone celebration emails with confetti animations. Create inactivity warning emails (day 7 and 9). Add email template system with branded designs.",
+        "testStrategy": "Test email delivery and templates, verify notification timing differences between plans, validate threshold settings, test weekly recap scheduling, and confirm milestone emails trigger correctly",
+        "priority": "medium",
+        "dependencies": [
+          "2",
+          "3"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Create Public Domain Lookup and Marketing Pages",
+        "description": "Build SEO-optimized public pages including domain lookup, pricing, and blog system",
+        "details": "Create public domain lookup at /domain/[slug] with cached DR values (24h cache). Build marketing homepage with hero section, live counter of monitored sites (8000+), dashboard screenshots, testimonials carousel, and pricing comparison table. Implement pricing page with feature comparison, FAQ section, and upgrade CTAs. Create blog system with markdown-based CMS, SEO optimization, Disqus comments, and newsletter signup. Add social sharing functionality.",
+        "testStrategy": "Test public domain lookup caching, verify SEO meta tags and structured data, validate pricing page accuracy, test blog functionality and comments, and confirm social sharing works correctly",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Enhance Data Visualization and Export Features",
+        "description": "Improve charts, add export capabilities, and implement data retention policies",
+        "details": "Enhance Chart.js integration with multi-domain comparison views. Add export functionality for PNG/CSV formats. Implement time range filters (7d, 30d, 90d, 1y, All time) with smooth transitions. Create hover tooltips with detailed metrics. Add data retention policies: unlimited for paid users, 90 days for free users. Implement GDPR-compliant data export and account deletion (30-day soft delete).",
+        "testStrategy": "Test chart rendering performance, verify export file formats and data accuracy, validate time range filtering, test data retention cleanup jobs, and confirm GDPR compliance features",
+        "priority": "low",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Implement Account Settings and Profile Management",
+        "description": "Create comprehensive account management with timezone settings, API tokens, and data management",
+        "details": "Build account settings page with profile management (display name from OAuth, timezone selection). Add notification preference controls per domain and global settings. Implement API token generation for future API access. Create data export functionality with CSV format. Add account deletion feature with 30-day soft delete policy. Integrate with billing system for subscription management.",
+        "testStrategy": "Test profile updates and persistence, verify timezone functionality affects data display, validate API token generation and security, test data export completeness, and confirm account deletion workflow",
+        "priority": "low",
+        "dependencies": [
+          "1",
+          "5"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Optimize Performance and Add Caching Layer",
+        "description": "Implement Redis caching, API rate limiting, and performance optimizations",
+        "details": "Set up Redis caching layer for DR lookup results, API responses, and frequently accessed data. Implement rate limiting for API endpoints using Upstash Redis. Add database query optimization and connection pooling. Implement background job processing for domain updates. Add performance monitoring and error tracking. Optimize InstantDB queries and subscriptions for real-time updates.",
+        "testStrategy": "Load test API endpoints with rate limiting, verify cache hit/miss ratios, test background job processing, monitor database performance metrics, and validate real-time update performance",
+        "priority": "low",
+        "dependencies": [
+          "2"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Add Comprehensive Analytics and Monitoring",
+        "description": "Implement user analytics, API usage tracking, and business metrics dashboard",
+        "details": "Create analytics system to track key metrics: signup conversion rates, activation rates (users adding 2+ domains), retention rates, churn analysis. Implement API usage cost tracking with budget monitoring alerts. Add business metrics dashboard for MRR growth, LTV:CAC ratios. Create automated reports for monthly business reviews. Implement error monitoring and alerting system. Add user behavior tracking for feature usage and engagement.",
+        "testStrategy": "Validate analytics data accuracy, test budget alert thresholds, verify business metric calculations, test automated report generation, and confirm error monitoring alerts work correctly",
+        "priority": "low",
+        "dependencies": [
+          "1",
+          "2",
+          "3"
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-10-23T20:46:21.167Z",
+      "taskCount": 10,
+      "completedCount": 0,
+      "tags": [
+        "master"
+      ],
+      "created": "2025-10-24T15:09:22.640Z",
+      "description": "Tasks for master context",
+      "updated": "2025-10-24T15:09:22.640Z"
+    }
+  }
+}

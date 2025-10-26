@@ -102,7 +102,7 @@ export default function DomainDetailPage() {
               </p>
               <div className="flex items-center gap-3">
                 <span className="text-5xl font-bold text-gray-900 dark:text-white">
-                  {domain.current_da}
+                  {domain.current_da.toFixed(1)}
                 </span>
                 {getTrendIcon()}
               </div>
@@ -114,7 +114,7 @@ export default function DomainDetailPage() {
               </p>
               <p className={`text-2xl font-semibold ${getTrendColor()}`}>
                 {domain.da_change > 0 ? "+" : ""}
-                {domain.da_change}
+                {domain.da_change.toFixed(1)}
               </p>
             </div>
 
@@ -123,7 +123,7 @@ export default function DomainDetailPage() {
                 Previous DR
               </p>
               <p className="text-2xl font-semibold text-gray-600 dark:text-gray-300">
-                {domain.previous_da}
+                {domain.previous_da.toFixed(1)}
               </p>
             </div>
           </div>

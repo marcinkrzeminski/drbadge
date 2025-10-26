@@ -1,11 +1,11 @@
 /**
  * API Route: Manual Domain Refresh (Paid Users Only)
  * Allows paid users to manually refresh domain DA metrics
- * with rate limiting (max 10 refreshes per hour)
+ * with configurable rate limiting (default: max 50 refreshes per 30 minutes)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { init } from '@instantdb/admin';
+import { init, id } from '@instantdb/admin';
 import { seoIntelligence } from '@/lib/seo-intelligence';
 
 const db = init({
@@ -13,9 +13,9 @@ const db = init({
   adminToken: process.env.INSTANTDB_ADMIN_TOKEN!,
 });
 
-// Rate limiting: max 10 refreshes per hour per user
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour in ms
-const RATE_LIMIT_MAX = 10;
+// Rate limiting: configurable via environment variables
+const RATE_LIMIT_WINDOW = (parseInt(process.env.REFRESH_RATE_LIMIT_WINDOW_MINUTES || '30') * 60 * 1000); // Default: 30 minutes in ms
+const RATE_LIMIT_MAX = parseInt(process.env.REFRESH_RATE_LIMIT_MAX || '50'); // Default: 50 refreshes
 
 // In-memory rate limit tracking (for simplicity in MVP)
 // In production, use Redis or database
@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { domainId, userId } = body;
 
+    console.log('[Refresh API] Request:', { domainId, userId });
+
     if (!domainId || !userId) {
       return NextResponse.json(
         { error: 'Domain ID and User ID are required' },
@@ -34,17 +36,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user to check subscription
-    const { data: userData } = await db.query({
+    const { users } = await db.query({
       users: {
         $: {
           where: {
-            auth_id: userId,
+            id: userId,
           },
         },
       },
     });
 
-    const user = userData?.users?.[0];
+    const user = users?.[0];
+
+    console.log('[Refresh API] User lookup result:', { found: !!user, userId });
 
     if (!user) {
       return NextResponse.json(
@@ -73,7 +77,7 @@ export async function POST(request: NextRequest) {
         {
           error: 'Rate limit exceeded',
           limit: RATE_LIMIT_MAX,
-          window: 'hour',
+          window: `${RATE_LIMIT_WINDOW / (60 * 1000)} minutes`,
           resetAt: rateLimitStatus.resetAt,
         },
         { status: 429 }
@@ -81,18 +85,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Get domain from database
-    const { data: domainData } = await db.query({
+    // Note: domains.user_id stores auth_id, not the users table id
+    const { domains } = await db.query({
       domains: {
         $: {
           where: {
             id: domainId,
-            user_id: user.id,
+            user_id: user.auth_id,
           },
         },
       },
     });
 
-    const domain = domainData.domains[0];
+    const domain = domains[0];
+
+    console.log('[Refresh API] Domain lookup result:', { 
+      found: !!domain, 
+      domainId, 
+      userId: user.id,
+      domainsCount: domains.length 
+    });
 
     if (!domain) {
       return NextResponse.json(
@@ -112,7 +124,7 @@ export async function POST(request: NextRequest) {
     incrementRateLimit(rateLimitKey);
 
     // Calculate changes
-    const previousDA = domain.current_da;
+    const previousDA = typeof domain.current_da === 'number' ? domain.current_da : 0;
     const currentDA = metrics.domainAuthority;
     const daChange = currentDA - previousDA;
 
@@ -173,7 +185,7 @@ export async function POST(request: NextRequest) {
 async function trackAPIUsage(domain: string): Promise<void> {
   try {
     await db.transact([
-      db.tx['api_usage'][db.id()].update({
+      db.tx['api_usage'][id()].update({
         provider: 'karmalabs',
         domain: domain,
         cost: 0.01,
@@ -268,7 +280,7 @@ async function createSnapshot(
     }
 
     await db.transact([
-      db.tx['dr_snapshots'][db.id()].update(snapshotData),
+      db.tx['dr_snapshots'][id()].update(snapshotData),
     ]);
   } catch (error) {
     console.error('[Snapshot] Failed to create snapshot:', error);

@@ -9,12 +9,16 @@ export const PLANS = {
     domainsLimit: 3,
     priceId: PRICE_IDS.FREE,
     price: 0,
+    refreshFrequency: '1x daily',
+    refreshDescription: 'Domain metrics updated once per day',
   },
   PAID: {
     name: 'Pro',
     domainsLimit: 12,
     priceId: PRICE_IDS.PAID,
     price: 5,
+    refreshFrequency: '4x daily',
+    refreshDescription: 'Domain metrics updated every 6 hours',
   },
 } as const;
 

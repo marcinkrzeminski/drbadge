@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { init, id } from "@instantdb/admin";
 import { seoIntelligence } from "@/lib/seo-intelligence";
-import { getUser } from "@/lib/user-utils";
+import { getUserByAuthId } from "@/lib/user-utils";
 import { getDomainsLimitForUser } from "@/lib/stripe";
 
 const db = init({
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get user data and check subscription limits
-    const user = await getUser(userId);
+    const user = await getUserByAuthId(userId);
     if (!user) {
       return NextResponse.json(
         { error: "User not found" },

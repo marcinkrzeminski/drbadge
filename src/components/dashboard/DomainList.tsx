@@ -1,6 +1,7 @@
 "use client";
 
 import { db } from "@/lib/instant-client";
+import { PLANS } from "@/lib/plans";
 import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck, ExternalLink, LayoutGrid, List, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,7 +86,7 @@ export function DomainList() {
     },
   });
 
-  const currentUser = userData?.users?.[0];
+  const currentUser = userData?.users?.[0] || null;
   const isPaidUser = currentUser?.subscription_status === 'paid';
 
   // Filter out deleted domains (where deleted_at exists and is > 0)
@@ -141,6 +142,16 @@ export function DomainList() {
   };
 
   const handleRefresh = async (domainId: string, domainUrl: string) => {
+    if (!user?.id) {
+      toast.error("You must be logged in to refresh domains");
+      return;
+    }
+
+    if (!currentUser) {
+      toast.error("User data not loaded yet. Please wait and try again.");
+      return;
+    }
+
     if (!isPaidUser) {
       toast.error("Manual refresh is only available for paid users");
       return;
@@ -148,15 +159,20 @@ export function DomainList() {
 
     setRefreshingId(domainId);
 
+    const payload = {
+      domainId,
+      userId: currentUser.id,
+    };
+    
+    console.log('[Frontend] Refresh request:', payload);
+
     try {
-      const response = await fetch("/api/domains/update", {
+      const response = await fetch("/api/domains/refresh", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          domainId,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -340,19 +356,22 @@ export function DomainList() {
                           }`}
                         >
                           {domain.da_change > 0 ? "↑" : "↓"}
-                          {Math.abs(domain.da_change)}
+                          {Math.abs(domain.da_change).toFixed(1)}
                         </span>
                       </div>
                     )}
                     <div className="mt-3">
                       <Sparkline snapshots={domainSnapshots} />
                     </div>
-                    <p className="mt-2 text-xs text-gray-500">
-                      Last updated:{" "}
-                      {domain.last_checked
-                        ? new Date(domain.last_checked).toLocaleDateString()
-                        : "Never"}
-                    </p>
+                     <p className="mt-2 text-xs text-gray-500">
+                       Last updated:{" "}
+                       {domain.last_checked
+                         ? new Date(domain.last_checked).toLocaleDateString()
+                         : "Never"}
+                     </p>
+                     <p className="mt-1 text-xs text-gray-500">
+                       {isPaidUser ? PLANS.PAID.refreshFrequency : PLANS.FREE.refreshFrequency}
+                     </p>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
@@ -425,6 +444,9 @@ export function DomainList() {
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Last Updated
                 </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Refresh Frequency
+                </th>
                 <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -462,7 +484,7 @@ export function DomainList() {
                           }`}
                         >
                           {domain.da_change > 0 ? "↑" : "↓"}
-                          {Math.abs(domain.da_change)}
+                          {Math.abs(domain.da_change).toFixed(1)}
                         </span>
                       ) : (
                         <span className="text-sm text-gray-400">-</span>
@@ -477,6 +499,9 @@ export function DomainList() {
                       {domain.last_checked
                         ? new Date(domain.last_checked).toLocaleDateString()
                         : "Never"}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                      {isPaidUser ? PLANS.PAID.refreshFrequency : PLANS.FREE.refreshFrequency}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                       <DropdownMenu>

@@ -1,5 +1,117 @@
 # Task Master AI - Agent Integration Guide
 
+## ⚠️ CRITICAL: User ID Handling in InstantDB
+
+### The Two Types of User IDs
+
+**IMPORTANT**: This project uses TWO different user identifiers:
+
+1. **`auth_id`** - The authentication ID from InstantDB Auth
+   - Available as `user.id` from `db.useAuth()` hook
+   - Example: `010254a8-ef6c-45da-9367-ee515b570a61`
+   - **✅ THIS is what domains and other entities use as foreign key**
+
+2. **`id`** - The database record ID for the user entity
+   - Available as `currentUser.id` from database query
+   - Example: `725a4aad-e42f-43aa-a41d-c5fda79212e3`
+   - **❌ This is NOT used for relationships**
+
+### Golden Rules
+
+#### ✅ ALWAYS Use `auth_id` For:
+- Foreign keys in all entities (domains, snapshots, etc.)
+- Looking up user-owned records
+- API endpoints that need to identify a user
+- Any relationship between entities and users
+
+#### ❌ NEVER Use database `id` For:
+- Foreign keys or relationships
+- Passing to API endpoints
+- Querying user-owned records
+
+### Code Patterns
+
+#### Frontend: Getting the Correct User ID
+
+```typescript
+// ✅ CORRECT - Use auth user.id for API calls
+const { user } = db.useAuth(); // user.id is the auth_id
+
+const response = await fetch('/api/domains/add', {
+  method: 'POST',
+  body: JSON.stringify({
+    userId: user.id, // ✅ This is auth_id
+  }),
+});
+
+// ❌ WRONG - Don't use database user id
+const { data } = db.useQuery({
+  users: { $: { where: { auth_id: user?.id } } }
+});
+const currentUser = data?.users?.[0];
+
+const response = await fetch('/api/domains/add', {
+  body: JSON.stringify({
+    userId: currentUser.id, // ❌ Wrong! This is database id
+  }),
+});
+```
+
+#### Backend: Looking Up Users
+
+```typescript
+// ✅ CORRECT - Query by auth_id
+const { userId } = await request.json(); // This is auth_id from frontend
+
+const { users } = await db.query({
+  users: {
+    $: { where: { auth_id: userId } }, // ✅ Correct
+  },
+});
+
+// ❌ WRONG - Querying by id when you have auth_id
+const { users } = await db.query({
+  users: {
+    $: { where: { id: userId } }, // ❌ Wrong!
+  },
+});
+```
+
+#### Backend: Querying User-Owned Records
+
+```typescript
+// ✅ CORRECT - Use auth_id for relationships
+const { userId } = await request.json(); // auth_id from frontend
+
+const { domains } = await db.query({
+  domains: {
+    $: {
+      where: {
+        user_id: userId, // ✅ user_id field stores auth_id
+        deleted_at: { $isNull: true },
+      },
+    },
+  },
+});
+```
+
+### Debugging User ID Issues
+
+If you see errors like "User not found" or "No domains found":
+
+1. Is the frontend sending `user.id` from `db.useAuth()`? ✅
+2. Is the backend querying `auth_id` (not `id`)? ✅
+3. Are foreign keys using `auth_id` values? ✅
+
+**Debug script:**
+```bash
+npx tsx scripts/debug-domains.ts
+```
+
+This shows User `id` vs `auth_id` and Domain `user_id` values.
+
+---
+
 ## Essential Commands
 
 ### Core Workflow Commands

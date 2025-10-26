@@ -45,6 +45,38 @@ const _schema = i.schema({
       "cost": i.number(), // e.g., 0.001
       "created_at": i.number().indexed(), // Unix timestamp
     }),
+    "achievements": i.entity({
+      "user_id": i.string().indexed(), // auth_id
+      "type": i.string(), // 'dr_milestone', 'domain_count', 'consistency', etc.
+      "value": i.number(), // DR value, domain count, etc.
+      "unlocked_at": i.number(), // Unix timestamp
+      "metadata": i.json().optional(), // Additional data like domain info
+    }),
+    "user_goals": i.entity({
+      "user_id": i.string().indexed(), // auth_id
+      "domain_id": i.string().indexed(), // Reference to domains.id
+      "target_dr": i.number(),
+      "current_dr": i.number(),
+      "deadline": i.number().optional(), // Unix timestamp
+      "created_at": i.number(), // Unix timestamp
+      "completed_at": i.number().optional(), // Unix timestamp
+      "status": i.string(), // 'active', 'completed', 'expired'
+    }),
+    "milestones": i.entity({
+      "user_id": i.string().indexed(), // auth_id
+      "domain_id": i.string().indexed(), // Reference to domains.id
+      "dr_value": i.number(),
+      "celebrated": i.boolean(),
+      "celebrated_at": i.number().optional(), // Unix timestamp
+    }),
+    "leaderboard_cache": i.entity({
+      "user_id": i.string().indexed(), // auth_id
+      "rank": i.number(),
+      "highest_dr": i.number(),
+      "total_domains": i.number(),
+      "last_updated": i.number(), // Unix timestamp
+      "category": i.string().optional(), // 'global', 'paid', etc.
+    }),
   },
   links: {},
   rooms: {},

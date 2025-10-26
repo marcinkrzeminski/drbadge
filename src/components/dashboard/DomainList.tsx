@@ -14,6 +14,8 @@ import { toast } from "sonner";
 import { useState, useEffect, useMemo } from "react";
 import { BadgeModal } from "@/components/domains/BadgeModal";
 import { Sparkline } from "@/components/charts/Sparkline";
+import { MilestoneSettings } from "@/components/dashboard/MilestoneSettings";
+import { GoalSetting } from "@/components/dashboard/GoalSetting";
 import Link from "next/link";
 
 type ViewMode = "grid" | "table";
@@ -516,18 +518,36 @@ export function DomainList() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() =>
-                              setBadgeModalDomain({
-                                url: domain.url,
-                                da: domain.current_da || 0,
-                              })
-                            }
-                            className="gap-2"
-                          >
-                            <BadgeCheck className="h-4 w-4" />
-                            Get Badge
-                          </DropdownMenuItem>
+                           <DropdownMenuItem
+                             onClick={() =>
+                               setBadgeModalDomain({
+                                 url: domain.url,
+                                 da: domain.current_da || 0,
+                               })
+                             }
+                             className="gap-2"
+                           >
+                             <BadgeCheck className="h-4 w-4" />
+                             Get Badge
+                           </DropdownMenuItem>
+                           {isPaidUser && (
+                             <>
+                               <div className="px-2 py-1">
+                                 <MilestoneSettings
+                                   domainId={domain.id}
+                                   domainUrl={domain.url}
+                                   currentDR={domain.current_da || 0}
+                                 />
+                               </div>
+                               <div className="px-2 py-1">
+                                 <GoalSetting
+                                   domainId={domain.id}
+                                   domainUrl={domain.url}
+                                   currentDR={domain.current_da || 0}
+                                 />
+                               </div>
+                             </>
+                           )}
                           <DropdownMenuItem
                             onClick={() => handleRefresh(domain.id, domain.url)}
                             className="gap-2"

@@ -6,6 +6,7 @@ import { Home, Settings, CreditCard, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { db } from "@/lib/instant-client";
 import { Button } from "@/components/ui/button";
+import { SidebarAchievements } from "@/components/dashboard/SidebarAchievements";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -17,6 +18,20 @@ export function Sidebar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = db.useAuth();
+
+  // Query user data to check subscription status
+  const { data: userData } = db.useQuery({
+    users: {
+      $: {
+        where: {
+          auth_id: user?.id,
+        },
+      },
+    },
+  });
+
+  const currentUser = userData?.users?.[0];
+  const isPaidUser = currentUser?.subscription_status === 'paid';
 
   const handleSignOut = () => {
     db.auth.signOut();
@@ -144,6 +159,14 @@ export function Sidebar() {
             );
           })}
         </nav>
+
+        {/* Achievements */}
+        {user?.id && (
+          <SidebarAchievements userId={user.id} isPaidUser={isPaidUser} />
+        )}
+
+        {/* Spacer */}
+        <div className="h-4"></div>
 
         {/* User profile */}
         <div className="border-t border-gray-200 p-4">

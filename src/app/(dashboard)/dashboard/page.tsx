@@ -123,6 +123,7 @@ export default function DashboardPage() {
         </div>
 
         <StatsCards />
+
         <DomainList />
       </div>
 

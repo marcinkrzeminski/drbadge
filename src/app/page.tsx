@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/instant-client";
-import { ArrowRight, BarChart3, Bell, TrendingUp, Zap } from "lucide-react";
+import { ArrowRight, BarChart3, Bell, TrendingUp, Zap, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -57,6 +57,12 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center space-x-4">
+              <Button asChild variant="ghost">
+                <Link href="/leaderboard">
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Leaderboard
+                </Link>
+              </Button>
               <Button onClick={handleSignIn} variant="default">
                 Sign In with Google
               </Button>
@@ -381,6 +387,11 @@ export default function HomePage() {
                 <li>
                   <Link href="#pricing" className="text-sm text-muted-foreground hover:text-foreground">
                     Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/leaderboard" className="text-sm text-muted-foreground hover:text-foreground">
+                    Leaderboard
                   </Link>
                 </li>
               </ul>

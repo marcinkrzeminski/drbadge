@@ -16,15 +16,45 @@
       {
         "id": 2,
         "title": "Enhance Domain Monitoring with Paid Features",
-        "description": "Implement tiered monitoring frequencies, manual refresh capabilities, and advanced metrics for paid users",
-        "details": "Add cron job system for 4x daily updates for paid users vs 1x daily for free users. Implement manual refresh API endpoint with rate limiting. Add backlinks and referring domains tracking to paid plans. Create activity pause logic after 10 days inactivity for free users. Update domain refresh UI to show frequency based on plan.",
-        "testStrategy": "Test cron job scheduling, verify refresh frequency differences between plans, validate manual refresh limits, test inactivity pause logic, and confirm advanced metrics are only shown to paid users",
-        "priority": "high",
+        "description": "Implement tiered monitoring frequencies and manual refresh capabilities for paid users",
+        "status": "done",
         "dependencies": [
-          "1"
+          1
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "high",
+        "details": "Add cron job system for 4x daily updates for paid users vs 1x daily for free users. Implement manual refresh API endpoint with rate limiting. Update domain refresh UI to show frequency based on plan. The manual refresh feature at src/app/api/domains/refresh/route.ts:24 is already implemented with proper rate limiting (10 per hour) and subscription checks, but uses the wrong endpoint (/api/domains/update instead of /api/domains/refresh) in DomainList component at src/components/dashboard/DomainList.tsx:152. Update the UI to use the correct endpoint and add refresh frequency display based on plan type from src/lib/plans.ts:32.",
+        "testStrategy": "Test cron job scheduling, verify refresh frequency differences between plans, validate manual refresh limits with correct API endpoint, and confirm UI displays refresh frequency information based on user's subscription status",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement cron job system for tiered domain monitoring",
+            "description": "Set up automated cron jobs that refresh domains at different frequencies based on user subscription status",
+            "dependencies": [],
+            "details": "Create cron job endpoints that check all domains and refresh them based on user plan: 4x daily (every 6 hours) for paid users and 1x daily (every 24 hours) for free users. Use the existing seoIntelligence.getDomainMetrics() function from src/lib/seo-intelligence.ts and subscription checks from src/lib/subscription-utils.ts. Implement proper scheduling logic that respects the last_checked timestamp.",
+            "status": "done",
+            "testStrategy": "Test cron job execution, verify correct timing intervals, validate subscription-based frequency differences, and ensure proper error handling for failed domain refreshes"
+          },
+          {
+            "id": 2,
+            "title": "Fix manual refresh API endpoint in UI components",
+            "description": "Update DomainList component to use the correct manual refresh API endpoint",
+            "dependencies": [],
+            "details": "Change the fetch request in src/components/dashboard/DomainList.tsx:152 from '/api/domains/update' to '/api/domains/refresh' to match the existing implementation in src/app/api/domains/refresh/route.ts. Ensure the request body includes both domainId and userId parameters as required by the API.",
+            "status": "done",
+            "testStrategy": "Test manual refresh functionality works correctly, verify rate limiting messages display properly, and confirm paid user restrictions are enforced"
+          },
+          {
+            "id": 3,
+            "title": "Add refresh frequency display in domain UI",
+            "description": "Update domain list and detail views to show refresh frequency based on user's plan",
+            "dependencies": [
+              2
+            ],
+            "details": "Add visual indicators in both grid and table views in DomainList component showing refresh frequency (e.g., '4x daily' for paid, '1x daily' for free). Use the subscription status from currentUser and reference PLANS from src/lib/plans.ts to determine display text. Add tooltip or help text explaining the refresh schedule differences.",
+            "status": "done",
+            "testStrategy": "Test frequency display shows correctly for both paid and free users, verify visual consistency across grid and table views, and ensure tooltips provide clear information about refresh schedules"
+          }
+        ]
       },
       {
         "id": 3,
@@ -37,7 +67,7 @@
           "1",
           "2"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -144,7 +174,7 @@
       ],
       "created": "2025-10-24T15:09:22.640Z",
       "description": "Tasks for master context",
-      "updated": "2025-10-24T15:09:22.640Z"
+      "updated": "2025-10-26T15:47:52.900Z"
     }
   }
 }

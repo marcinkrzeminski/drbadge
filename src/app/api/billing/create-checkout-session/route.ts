@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe, PLANS } from '@/lib/stripe';
-import { getUser, updateUser } from '@/lib/user-utils';
+import { stripe } from '@/lib/stripe';
+import { PLANS } from '@/lib/plans';
+import { getUserByAuthId, updateUser } from '@/lib/user-utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +14,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user data
-    const user = await getUser(userId);
+    // Get user data by auth ID
+    const user = await getUserByAuthId(userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },
@@ -37,13 +38,13 @@ export async function POST(request: NextRequest) {
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: {
-          userId: userId,
+          userId: user.id,
         },
       });
       customerId = customer.id;
 
       // Update user with Stripe customer ID
-      await updateUser(userId, {
+      await updateUser(user.id, {
         stripe_customer_id: customerId,
       });
     }
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       success_url: `${request.nextUrl.origin}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${request.nextUrl.origin}/dashboard?canceled=true`,
       metadata: {
-        userId: userId,
+        userId: user.id,
         planType: plan.name.toLowerCase(),
       },
       allow_promotion_codes: true,

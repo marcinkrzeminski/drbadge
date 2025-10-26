@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getUser } from '@/lib/user-utils';
+import { getUserByAuthId } from '@/lib/user-utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +13,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user data
-    const user = await getUser(userId);
+    // Get user data by auth ID
+    const user = await getUserByAuthId(userId);
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },

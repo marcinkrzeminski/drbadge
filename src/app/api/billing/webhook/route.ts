@@ -70,7 +70,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   }
 
   try {
-    // Update user subscription status
     await updateUser(userId, {
       subscription_status: 'paid',
       stripe_customer_id: customerId,

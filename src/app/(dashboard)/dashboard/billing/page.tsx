@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Calendar, CheckCircle, XCircle, ExternalLink } from "lucide-react";
-import { PLANS } from "@/lib/stripe";
+import { PLANS } from "@/lib/plans";
 
 interface SubscriptionStatus {
   subscriptionStatus: string;
@@ -48,24 +48,24 @@ export default function BillingPage() {
     fetchSubscriptionStatusCallback();
   }, [fetchSubscriptionStatusCallback]);
 
-  const fetchSubscriptionStatus = async () => {
-    if (!user?.id) return;
+  // Refresh after successful checkout (webhook handles the update)
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
 
-    try {
-      const response = await fetch(`/api/billing/subscription-status?userId=${user.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSubscriptionStatus(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch subscription status:', error);
-    } finally {
-      setLoading(false);
+    if (searchParams.get('success') === 'true') {
+      // Give webhook time to process, then refresh
+      setTimeout(() => {
+        fetchSubscriptionStatusCallback();
+      }, 2000);
+
+      // Clean up URL
+      window.history.replaceState({}, '', '/dashboard/billing');
     }
-  };
+  }, [fetchSubscriptionStatusCallback]);
 
   const handleUpgrade = async () => {
     if (!user?.id) return;
+
 
     try {
       const response = await fetch('/api/billing/create-checkout-session', {
@@ -77,9 +77,13 @@ export default function BillingPage() {
         }),
       });
 
+
       if (response.ok) {
         const { url } = await response.json();
         window.location.href = url;
+      } else {
+        const errorData = await response.json();
+        console.error('DEBUG error response:', errorData);
       }
     } catch (error) {
       console.error('Failed to create checkout session:', error);

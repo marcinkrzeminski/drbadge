@@ -77,6 +77,35 @@ const _schema = i.schema({
       "last_updated": i.number(), // Unix timestamp
       "category": i.string().optional(), // 'global', 'paid', etc.
     }),
+    "email_notification_preferences": i.entity({
+      "domain_id": i.string().indexed(), // Reference to domains.id
+      "instant_alerts": i.boolean(), // For paid users - immediate DR changes
+      "daily_batch": i.boolean(), // For free users - daily summary
+      "weekly_recaps": i.boolean(), // Monday recap emails
+      "milestone_celebrations": i.boolean(), // Achievement emails
+      "inactivity_warnings": i.boolean(), // Day 7 and 9 warnings
+      "da_threshold": i.number(), // Minimum DA change to trigger alerts
+      "created_at": i.number(), // Unix timestamp
+      "updated_at": i.number(), // Unix timestamp
+    }),
+    "domain_milestones": i.entity({
+      "domain_id": i.string().indexed(), // Reference to domains.id
+      "da_value": i.number(), // The DA milestone achieved
+      "celebrated": i.boolean(), // Whether celebration email was sent
+      "celebrated_at": i.number().optional(), // Unix timestamp when celebrated
+      "created_at": i.number(), // Unix timestamp
+      // Note: Unique constraint on (domain_id, da_value) enforced at application level
+    }),
+    "email_logs": i.entity({
+      "user_id": i.string().optional().indexed(), // Reference to users.auth_id
+      "domain_id": i.string().optional().indexed(), // Reference to domains.id
+      "email_to": i.string().indexed(), // Recipient email
+      "email_type": i.string(), // Type of email sent
+      "status": i.string(), // 'sent' or 'failed'
+      "error_message": i.string().optional(), // Error details if failed
+      "sent_at": i.number().indexed(), // Unix timestamp
+      "metadata": i.string().optional(), // JSON string with additional context
+    }),
   },
   links: {},
   rooms: {},

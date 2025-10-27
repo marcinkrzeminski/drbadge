@@ -45,6 +45,40 @@ export interface ApiUsage {
   created_at: number; // Unix timestamp
 }
 
+export interface EmailNotificationPreferences {
+  id: string;
+  domain_id: string; // References Domain.id
+  instant_alerts: boolean; // For paid users - immediate DR changes
+  daily_batch: boolean; // For free users - daily summary
+  weekly_recaps: boolean; // Monday recap emails
+  milestone_celebrations: boolean; // Achievement emails
+  inactivity_warnings: boolean; // Day 7 and 9 warnings
+  da_threshold: number; // Minimum DA change to trigger alerts (default: 1)
+  created_at: number; // Unix timestamp
+  updated_at: number; // Unix timestamp
+}
+
+export interface DomainMilestone {
+  id: string;
+  domain_id: string; // References Domain.id
+  da_value: number; // The DA milestone achieved (e.g., 20, 30, 50)
+  celebrated: boolean; // Whether celebration email was sent
+  celebrated_at?: number; // Unix timestamp when celebrated
+  created_at: number; // Unix timestamp
+}
+
+export interface EmailLog {
+  id: string;
+  user_id?: string; // References User.auth_id (optional for system emails)
+  domain_id?: string; // References Domain.id (optional)
+  email_to: string; // Recipient email address
+  email_type: 'dr-change-alert' | 'daily-batch' | 'weekly-recap' | 'milestone-celebration' | 'inactivity-warning';
+  status: 'sent' | 'failed';
+  error_message?: string; // Error details if failed
+  sent_at: number; // Unix timestamp
+  metadata?: string; // JSON string with additional context (e.g., DA values, domain count)
+}
+
 /**
  * Helper function to create initial user data
  */
@@ -74,5 +108,24 @@ export function createDomainData(
     da_change: 0,
     last_checked: 0,
     created_at: Date.now(),
+  };
+}
+
+/**
+ * Helper function to create default email notification preferences for a domain
+ */
+export function createDefaultNotificationPreferences(
+  domainId: string
+): Omit<EmailNotificationPreferences, 'id'> {
+  return {
+    domain_id: domainId,
+    instant_alerts: false, // Default off, user can enable
+    daily_batch: true, // Default on for all users
+    weekly_recaps: true, // Default on for all users
+    milestone_celebrations: true, // Default on for all users
+    inactivity_warnings: true, // Default on for all users
+    da_threshold: 1, // Alert on any DA change >= 1
+    created_at: Date.now(),
+    updated_at: Date.now(),
   };
 }

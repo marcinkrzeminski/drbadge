@@ -18,7 +18,7 @@ const _schema = i.schema({
       "subscription_status": i.string(), // 'free' | 'paid' | 'cancelled'
       "stripe_customer_id": i.string().optional(),
       "subscription_ends_at": i.number().optional(), // Unix timestamp
-      "domains_limit": i.number(), // 3 or 12
+      "domains_limit": i.number(), // 15 or more based on plan
       "created_at": i.number(), // Unix timestamp
     }),
     "domains": i.entity({

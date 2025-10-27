@@ -93,6 +93,27 @@ export function DomainList() {
   const currentUser = userData?.users?.[0] || null;
   const isPaidUser = currentUser?.subscription_status === 'paid';
 
+  // Get user's refresh frequency based on their subscription
+  const getUserRefreshInfo = () => {
+    if (!isPaidUser) {
+      return {
+        frequency: PLANS.FREE.refreshFrequency,
+        description: PLANS.FREE.refreshDescription
+      };
+    }
+
+    // Get user's plan based on domains_limit
+    const domainsLimit = currentUser?.domains_limit || 15;
+    const plan = Object.values(PLANS).find(p => p.domainsLimit === domainsLimit && p.price > 0);
+
+    return {
+      frequency: plan?.refreshFrequency || '4x daily + on-demand',
+      description: plan?.refreshDescription || 'Automatic updates every 6 hours plus unlimited manual refresh'
+    };
+  };
+
+  const refreshInfo = getUserRefreshInfo();
+
   // Filter out deleted domains (where deleted_at exists and is > 0)
   const filteredDomains = (data?.domains || []).filter(d => !d.deleted_at || d.deleted_at === 0);
 
@@ -374,8 +395,8 @@ export function DomainList() {
                          ? new Date(domain.last_checked).toLocaleDateString()
                          : "Never"}
                      </p>
-                     <p className="mt-1 text-xs text-gray-500">
-                       {isPaidUser ? PLANS.PAID.refreshFrequency : PLANS.FREE.refreshFrequency}
+                     <p className="mt-1 text-xs text-gray-500" title={refreshInfo.description}>
+                       {refreshInfo.frequency}
                      </p>
                   </div>
                   <DropdownMenu>
@@ -505,8 +526,8 @@ export function DomainList() {
                         ? new Date(domain.last_checked).toLocaleDateString()
                         : "Never"}
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                      {isPaidUser ? PLANS.PAID.refreshFrequency : PLANS.FREE.refreshFrequency}
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500" title={refreshInfo.description}>
+                      {refreshInfo.frequency}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-right text-sm font-medium">
                       <DropdownMenu>

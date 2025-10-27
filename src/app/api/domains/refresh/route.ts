@@ -1,7 +1,8 @@
 /**
- * API Route: Manual Domain Refresh (Paid Users Only)
- * Allows paid users to manually refresh domain DA metrics
- * with configurable rate limiting (default: max 50 refreshes per 30 minutes)
+ * API Route: On-Demand Domain Refresh (Paid Users Only)
+ * Allows paid users to manually trigger immediate DR updates (unlimited with fair usage policy)
+ * Rate limiting: max 50 refreshes per 30 minutes (~2400/day) to prevent abuse
+ * Part of competitive feature set matching FrogDR: "4x daily auto + unlimited on-demand"
  */
 
 import { NextRequest, NextResponse } from 'next/server';

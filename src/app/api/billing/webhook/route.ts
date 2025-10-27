@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe';
 import { updateUser } from '@/lib/user-utils';
+import { PLANS } from '@/lib/plans';
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
   const customerId = session.customer;
   const userId = session.metadata?.userId;
+  const domainsLimit = session.metadata?.domainsLimit ? parseInt(session.metadata.domainsLimit) : 15;
 
   if (!userId) {
     console.error('No userId in checkout session metadata');
@@ -73,9 +75,10 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     await updateUser(userId, {
       subscription_status: 'paid',
       stripe_customer_id: customerId,
+      domains_limit: domainsLimit,
     });
 
-    console.log(`User ${userId} subscription activated`);
+    console.log(`User ${userId} subscription activated with ${domainsLimit} domains limit`);
   } catch (error) {
     console.error('Failed to update user after checkout:', error);
   }
@@ -102,12 +105,23 @@ async function handleSubscriptionChange(subscription: Stripe.Subscription) {
       subscriptionStatus = 'cancelled';
     }
 
+    // Get the domains limit from the subscription items if available
+    let domainsLimit = user.domains_limit;
+    if (subscriptionStatus === 'paid' && subscription.items.data.length > 0) {
+      const priceId = subscription.items.data[0].price.id;
+      const plan = Object.values(PLANS).find(p => p.priceId === priceId);
+      if (plan) {
+        domainsLimit = plan.domainsLimit;
+      }
+    }
+
     await updateUser(user.id, {
       subscription_status: subscriptionStatus,
       subscription_ends_at: (subscription as any).current_period_end * 1000, // Convert to milliseconds
+      domains_limit: domainsLimit,
     });
 
-    console.log(`User ${user.id} subscription updated to ${subscriptionStatus}`);
+    console.log(`User ${user.id} subscription updated to ${subscriptionStatus} with ${domainsLimit} domains limit`);
   } catch (error) {
     console.error('Failed to handle subscription change:', error);
   }
@@ -123,12 +137,14 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       return;
     }
 
+    // Keep the domains limit for reference even after cancellation
     await updateUser(user.id, {
       subscription_status: 'cancelled',
       subscription_ends_at: (subscription as any).current_period_end * 1000,
+      domains_limit: user.domains_limit,
     });
 
-    console.log(`User ${user.id} subscription cancelled`);
+    console.log(`User ${user.id} subscription cancelled with ${user.domains_limit} domains limit`);
   } catch (error) {
     console.error('Failed to handle subscription deletion:', error);
   }

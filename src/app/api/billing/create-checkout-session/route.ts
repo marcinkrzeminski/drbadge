@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         userId: user.id,
         planType: plan.name.toLowerCase(),
+        domainsLimit: plan.domainsLimit,
       },
       allow_promotion_codes: true,
     });

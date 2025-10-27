@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const domainsLimit = getDomainsLimitForUser(user.subscription_status);
+    const domainsLimit = getDomainsLimitForUser(user.subscription_status, user.domains_limit);
 
     return NextResponse.json({
       subscriptionStatus: user.subscription_status,

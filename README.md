@@ -10,6 +10,7 @@ Track your website's Domain Rating effortlessly with instant alerts and beautifu
 - 📱 **Dashboard Views** - Grid or table view with sorting options
 - 🔔 **Email Alerts** - Get notified when your DR changes
 - 📈 **Data Visualization** - Time range filters (7d, 30d, 90d, All time)
+- 💰 **Flexible Pricing** - Choose from 15, 25, 50, or 100 domains
 
 ## Getting Started
 
@@ -83,3 +84,19 @@ This is useful for:
 - **API:** SEO Intelligence (RapidAPI)
 - **Auth:** InstantDB Auth
 - **Payments:** Stripe
+
+## Pricing Plans
+
+DrBadge offers flexible pricing plans to suit your needs:
+
+- **Free Plan**: 15 domains, basic features, updated once daily
+- **Pro Plan (15 domains)**: $75/month or $750/year (15% discount), advanced features, updated every 6 hours
+- **Pro Plan (25 domains)**: $125/month or $1,250/year (15% discount), advanced features, updated every 6 hours
+- **Pro Plan (50 domains)**: $250/month or $2,500/year (15% discount), advanced features, updated every 6 hours
+- **Pro Plan (100 domains)**: $500/month or $5,000/year (15% discount), advanced features, updated every 6 hours
+
+All paid plans include:
+- Advanced analytics
+- Priority support
+- Export data capabilities
+- 90% profitability guarantee

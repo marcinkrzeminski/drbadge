@@ -37,6 +37,7 @@ export async function createSubscription(userId: string, priceId: string) {
     });
 
     // Update user subscription status
+    // For now, we'll use a default limit - in the future we'll extract this from the subscription
     const domainsLimit = getDomainsLimitForUser('paid');
     await updateUser(userId, {
       subscription_status: 'paid',

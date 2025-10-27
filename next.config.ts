@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withPostHogConfig } from "@posthog/nextjs-config";
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -20,4 +21,11 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-export default nextConfig;
+export default withPostHogConfig(nextConfig, {
+  personalApiKey: process.env.NEXT_PUBLIC_POSTHOG_KEY || "",
+  envId: process.env.POSTHOG_ENV_ID || "",
+  host: "https://eu.i.posthog.com",
+  sourcemaps: {
+    enabled: true,
+  },
+});

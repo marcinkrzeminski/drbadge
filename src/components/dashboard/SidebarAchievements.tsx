@@ -26,8 +26,8 @@ export function SidebarAchievements({ userId, isPaidUser = false }: SidebarAchie
   const calculateBadges = () => {
     const badges = [];
     const totalDomains = domains.length;
-    const highestDR = Math.max(...domains.map(d => d.current_da || 0), 0);
-    const avgDR = totalDomains > 0 ? domains.reduce((sum, d) => sum + (d.current_da || 0), 0) / totalDomains : 0;
+    const highestDR = Math.max(...domains.map(d => d.current_dr || 0), 0);
+    const avgDR = totalDomains > 0 ? domains.reduce((sum, d) => sum + (d.current_dr || 0), 0) / totalDomains : 0;
 
     // Domain count badges
     badges.push({ id: 'first-domain', name: 'First Steps', icon: Star, earned: totalDomains >= 1, description: 'Add your first domain' });

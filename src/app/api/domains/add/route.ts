@@ -3,6 +3,7 @@ import { init, id } from "@instantdb/admin";
 import { seoIntelligence } from "@/lib/seo-intelligence";
 import { getUserByAuthId } from "@/lib/user-utils";
 import { getDomainsLimitForUser } from "@/lib/stripe";
+import { initializeDomainNotifications } from "@/lib/notification-utils";
 
 const db = init({
   appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -78,28 +79,31 @@ export async function POST(req: NextRequest) {
       }),
     ]);
 
-    // Create domain with initial DR value and first snapshot
-    await db.transact([
-      db.tx.domains[domainId].update({
-        user_id: userId,
-        url: url,
-        normalized_url: normalizedUrl,
-        current_da: metrics.domainAuthority,
-        previous_da: metrics.domainAuthority,
-        da_change: 0,
-        last_checked: now,
-        created_at: now,
-      }),
-      // Create initial snapshot
-      db.tx.dr_snapshots[id()].update({
-        domain_id: domainId,
-        da_value: metrics.domainAuthority,
-        backlinks: metrics.backlinks,
-        referring_domains: metrics.referringDomains,
-        recorded_at: now,
-        created_at: now,
-      }),
-    ]);
+     // Create domain with initial DR value and first snapshot
+     await db.transact([
+       db.tx.domains[domainId].update({
+         user_id: userId,
+         url: url,
+         normalized_url: normalizedUrl,
+         current_da: metrics.domainAuthority,
+         previous_da: metrics.domainAuthority,
+         da_change: 0,
+         last_checked: now,
+         created_at: now,
+       }),
+       // Create initial snapshot
+       db.tx.dr_snapshots[id()].update({
+         domain_id: domainId,
+         da_value: metrics.domainAuthority,
+         backlinks: metrics.backlinks,
+         referring_domains: metrics.referringDomains,
+         recorded_at: now,
+         created_at: now,
+       }),
+     ]);
+
+     // Initialize notification preferences for the new domain
+     await initializeDomainNotifications(domainId);
 
     return NextResponse.json({
       success: true,

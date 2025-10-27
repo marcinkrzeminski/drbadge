@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
-import { db } from './instant-client';
+import { db, id } from './instant-client';
 
 const MILESTONES = [10, 25, 50, 75];
 
@@ -64,8 +64,16 @@ export function useMilestoneCelebration() {
           // Trigger confetti celebration
           triggerConfetti();
 
-          // For now, skip database recording until types are updated
-          // TODO: Record milestone in database once schema types are regenerated
+          // Record milestone in database
+          db.transact([
+            db.tx.milestones[id()].update({
+              user_id: user.id,
+              domain_id: domain.id,
+              dr_value: milestone,
+              celebrated: true,
+              celebrated_at: Date.now(),
+            })
+          ]);
 
           // Show a toast notification
           console.log(`🎉 Milestone reached! Domain ${domain.url} reached DR ${milestone}!`);

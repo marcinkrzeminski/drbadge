@@ -94,7 +94,7 @@
           "2",
           "3"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -174,7 +174,7 @@
       ],
       "created": "2025-10-24T15:09:22.640Z",
       "description": "Tasks for master context",
-      "updated": "2025-10-26T15:47:52.900Z"
+      "updated": "2025-10-27T10:59:35.708Z"
     }
   }
 }

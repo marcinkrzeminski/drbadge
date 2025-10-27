@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import posthog from 'posthog-js';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -67,6 +68,17 @@ export function NotificationSettings({ domainId, domainUrl, isPaidUser }: Notifi
       if (!response.ok) {
         throw new Error('Failed to save preferences');
       }
+
+      posthog.capture('notification_settings_saved', {
+        domainId: domainId,
+        domainUrl: domainUrl,
+        instant_alerts: preferences.instant_alerts,
+        daily_batch: preferences.daily_batch,
+        weekly_recaps: preferences.weekly_recaps,
+        milestone_celebrations: preferences.milestone_celebrations,
+        inactivity_warnings: preferences.inactivity_warnings,
+        da_threshold: preferences.da_threshold,
+      });
 
       toast.success('Notification settings saved successfully');
     } catch (error) {

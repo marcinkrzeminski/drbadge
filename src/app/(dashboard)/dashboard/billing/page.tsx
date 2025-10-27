@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Calendar, CheckCircle, XCircle, ExternalLink } from "lucide-react";
 import { PLANS } from "@/lib/plans";
+import posthog from 'posthog-js';
 
 interface SubscriptionStatus {
   subscriptionStatus: string;
@@ -66,6 +67,10 @@ export default function BillingPage() {
   const handleUpgrade = async () => {
     if (!user?.id) return;
 
+    posthog.capture('upgrade-to-pro-clicked', {
+      price: PLANS.PAID.price,
+      priceId: PLANS.PAID.priceId
+    });
 
     try {
       const response = await fetch('/api/billing/create-checkout-session', {
@@ -92,6 +97,8 @@ export default function BillingPage() {
 
   const handleManageBilling = async () => {
     if (!user?.id) return;
+
+    posthog.capture('manage-billing-clicked');
 
     try {
       const response = await fetch('/api/billing/create-portal-session', {

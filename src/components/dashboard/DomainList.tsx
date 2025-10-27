@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from 'posthog-js';
 import { db } from "@/lib/instant-client";
 import { PLANS } from "@/lib/plans";
 import { Plus, MoreVertical, Trash2, RefreshCw, BadgeCheck, ExternalLink, LayoutGrid, List, ArrowUpDown } from "lucide-react";
@@ -53,6 +54,7 @@ export function DomainList() {
 
   // Save view mode to localStorage
   const handleViewModeChange = (mode: ViewMode) => {
+    posthog.capture('domain_view_mode_changed', { view_mode: mode });
     setViewMode(mode);
     localStorage.setItem("domainViewMode", mode);
   };
@@ -124,6 +126,7 @@ export function DomainList() {
       return;
     }
 
+    posthog.capture('domain_deleted', { domain_id: domainId, domain_url: domainUrl });
     setDeletingId(domainId);
 
     try {

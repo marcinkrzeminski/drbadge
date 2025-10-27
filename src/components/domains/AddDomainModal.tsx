@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import posthog from 'posthog-js';
 
 const domainSchema = z.object({
   url: z
@@ -38,7 +39,7 @@ interface AddDomainModalProps {
 
 function normalizeDomain(url: string): string {
   // Remove protocol
-  let domain = url.replace(/^https?:\/\//, "");
+  let domain = url.replace(/^(https?:\/\/)/, "");
   // Remove www
   domain = domain.replace(/^www\./, "");
   // Remove trailing slash and path
@@ -94,6 +95,11 @@ export function AddDomainModal({ open, onOpenChange }: AddDomainModalProps) {
 
     // Check domain limit
     if (domains.length >= domainsLimit) {
+      posthog.capture('domain_add_failed', {
+        reason: 'domain_limit_reached',
+        limit: domainsLimit,
+        current_domains: domains.length
+      });
       toast.error(
         `You've reached your limit of ${domainsLimit} domains. ${
           domainsLimit === 3 ? "Upgrade to paid plan to track up to 12 domains." : ""
@@ -107,6 +113,10 @@ export function AddDomainModal({ open, onOpenChange }: AddDomainModalProps) {
     // Check for duplicates
     const duplicate = domains.find((d) => d.normalized_url === normalizedUrl);
     if (duplicate) {
+      posthog.capture('domain_add_failed', {
+        reason: 'duplicate_domain',
+        domain_url: normalizedUrl
+      });
       toast.error("This domain is already being tracked");
       return;
     }
@@ -130,16 +140,29 @@ export function AddDomainModal({ open, onOpenChange }: AddDomainModalProps) {
       const result = await response.json();
 
       if (!response.ok) {
+        posthog.capture('domain_add_failed', {
+          reason: 'api_error',
+          domain_url: normalizedUrl,
+          error_message: result.error || "Failed to add domain"
+        });
         toast.error(result.error || "Failed to add domain");
         return;
       }
 
+      posthog.capture('domain_added', {
+        domain_url: normalizedUrl,
+        domain_rating: result.domain.current_da
+      });
       toast.success(
         `Domain added successfully! DR: ${result.domain.current_da}`
       );
       reset();
       onOpenChange(false);
     } catch (error) {
+      posthog.capture('domain_add_failed', {
+        reason: 'client_error',
+        domain_url: normalizedUrl
+      });
       console.error("Error adding domain:", error);
       toast.error("Failed to add domain. Please try again.");
     } finally {

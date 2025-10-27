@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Progress } from "@/components/ui/progress";
 import { Target, Plus, Calendar, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import posthog from 'posthog-js';
 
 interface GoalSettingProps {
   domainId: string;
@@ -52,6 +53,14 @@ export function GoalSetting({ domainId, domainUrl, currentDR }: GoalSettingProps
     try {
       const deadlineTimestamp = deadline ? new Date(deadline).getTime() : undefined;
 
+      posthog.capture('goal_set', {
+        domain_id: domainId,
+        domain_url: domainUrl,
+        current_dr: currentDR,
+        target_dr: target,
+        has_deadline: !!deadline,
+      });
+
       await db.transact([
         db.tx.user_goals[crypto.randomUUID()].update({
           user_id: user?.id,
@@ -77,6 +86,13 @@ export function GoalSetting({ domainId, domainUrl, currentDR }: GoalSettingProps
     if (!activeGoal) return;
 
     try {
+      posthog.capture('goal_progress_updated', {
+        domain_id: domainId,
+        domain_url: domainUrl,
+        goal_id: activeGoal.id,
+        current_dr: currentDR,
+        target_dr: activeGoal.target_dr,
+      });
       await db.transact([
         db.tx.user_goals[activeGoal.id].update({
           current_dr: currentDR,
@@ -93,6 +109,12 @@ export function GoalSetting({ domainId, domainUrl, currentDR }: GoalSettingProps
     if (!activeGoal) return;
 
     try {
+      posthog.capture('goal_completed', {
+        domain_id: domainId,
+        domain_url: domainUrl,
+        goal_id: activeGoal.id,
+        target_dr: activeGoal.target_dr,
+      });
       await db.transact([
         db.tx.user_goals[activeGoal.id].update({
           status: "completed",

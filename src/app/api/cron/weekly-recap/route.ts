@@ -96,14 +96,14 @@ export async function GET(request: NextRequest) {
 
         // Get domain IDs for this user to avoid N+1 queries
         const domainIds = user.domains.map(d => d.id);
+        const domainIdSet = new Set(domainIds);
 
-        // Get snapshots for this specific user's domains from the past week
-        // This query is optimized to only fetch snapshots for this user's domains
-        const { dr_snapshots } = await db.query({
+        // Get snapshots from the past week
+        // Note: InstantDB doesn't support $in on nested queries, so we filter in memory
+        const { dr_snapshots: allSnapshots } = await db.query({
           dr_snapshots: {
             $: {
               where: {
-                domain_id: { $in: domainIds },
                 recorded_at: {
                   $gte: lastMonday.getTime(),
                   $lt: thisMonday.getTime(),
@@ -113,7 +113,10 @@ export async function GET(request: NextRequest) {
           },
         });
 
-        if (!dr_snapshots || dr_snapshots.length === 0) {
+        // Filter to only this user's domains
+        const dr_snapshots = allSnapshots?.filter(s => domainIdSet.has(s.domain_id)) || [];
+
+        if (dr_snapshots.length === 0) {
           console.log(`[Weekly Recap] No snapshots found for user ${user.email} this week`);
           return { success: false, skipped: true, email: user.email };
         }

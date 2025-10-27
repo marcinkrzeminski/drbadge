@@ -9,6 +9,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { init, id } from '@instantdb/admin';
 import { seoIntelligence } from '@/lib/seo-intelligence';
+import { sendDRChangeAlert } from '@/lib/email';
+import { shouldSendInstantAlert, getDAThreshold, checkAndCelebrateMilestones } from '@/lib/notification-utils';
 
 const db = init({
   appId: process.env.NEXT_PUBLIC_INSTANTDB_APP_ID!,
@@ -97,6 +99,40 @@ export async function GET(request: NextRequest) {
             last_checked: now,
           }),
         ]);
+
+        // Send instant alert for significant DA changes (paid users only)
+        if (Math.abs(daChange) > 0) {
+          try {
+            const shouldSendAlert = await shouldSendInstantAlert(domain.id);
+            const daThreshold = await getDAThreshold(domain.id);
+
+            if (shouldSendAlert && Math.abs(daChange) >= daThreshold) {
+              console.log(`[Domain Monitor] Sending instant alert for ${domain.normalized_url}: DA ${previousDA} → ${currentDA} (${daChange >= 0 ? '+' : ''}${daChange})`);
+
+              await sendDRChangeAlert(
+                user.email,
+                domain.url,
+                previousDA,
+                currentDA,
+                daChange
+              );
+
+              console.log(`[Domain Monitor] Instant alert sent to ${user.email} for ${domain.normalized_url}`);
+            }
+          } catch (error) {
+            console.error(`[Domain Monitor] Failed to send instant alert for ${domain.normalized_url}:`, error);
+            // Don't fail the entire process for email errors
+          }
+        }
+
+        // Check for and celebrate milestones
+        await checkAndCelebrateMilestones(
+          domain.id,
+          domain.url,
+          user.email,
+          currentDA,
+          previousDA
+        );
 
         // Create snapshot
         await createSnapshot(

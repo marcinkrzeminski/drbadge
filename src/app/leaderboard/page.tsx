@@ -19,19 +19,21 @@ interface LeaderboardEntry {
 async function getLeaderboardData(): Promise<LeaderboardEntry[]> {
   const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
 
-  // Get all domains with their snapshots from the last 30 days
+  // Get all domains with their snapshots from the last 30 days, with pagination
   const result = await db.query({
     domains: {
       $: {
         where: {
           deleted_at: { $isNull: true },
         },
+        limit: 1000, // Limit the number of domains to prevent performance issues
       },
       dr_snapshots: {
         $: {
           where: {
             recorded_at: { $gte: thirtyDaysAgo },
           },
+          limit: 30, // Limit snapshots to 30 days max
         },
       },
     },
